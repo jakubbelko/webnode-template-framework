@@ -4703,3 +4703,42 @@ $wtf-blocks-space: (
 		768px   15px,
 		900px   20px
 ) !default;
+
+
+// 1] viewport width
+// 2] column width
+
+//	1		2
+$wtf-column-width: (
+		800px:	94%,
+		900px:	90%,
+		1200px:	84%,
+		1400px:	84%
+) !default;
+
+// Repsonsivní zůžování sloupce pro Blogy
+
+$blog-column-width: (
+		800px:	70%,
+		900px:	70%,
+		1200px:	70%,
+		1400px:	70%
+) !default;
+
+
+// Responsivní spacing pro typografii
+
+$wtf-typo-space: (
+		0       15px,
+		768px   20px
+) !default;
+
+
+// Responsivní zůžení sloupce pro formuláře
+
+$form-column-width: (
+		$wtf-bp-phablet:	86%,
+		$wtf-bp-tablet:		71%,
+		$wtf-bp-desktop:	66%,
+		$wtf-bp-desktop-hd:	64%
+) !default;
