@@ -1,0 +1,36 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin prefixer
+//
+// $property - CSS vlastnost
+// $value - hodnota/y
+//
+// @author:		mke + jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @example: @include prefixer(border-radius, 4px);
+// @source: http://css-tricks.com/how-to-deal-with-vendor-prefixes/
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin prefixer($property, $value...) {
+  @if $property == transition {
+	@include prefix($property, webkit spec, $value);
+  } @else if $property == animation {
+	@include prefix($property, webkit spec, $value);
+  } @else if $property == column-count {
+	@include prefix($property, webkit moz spec, $value);
+  } @else if $property == column-width {
+	@include prefix($property, webkit moz spec, $value);
+  } @else if $property == column-gap {
+	@include prefix($property, webkit moz spec, $value);
+  } @else if $property == transform {
+	@include prefix($property, webkit ms spec, $value);
+  } @else if $property == filter {
+	@include prefix($property, webkit spec, $value);
+  } @else if $property == backface-visibility {
+	@include prefix($property, webkit spec, $value);
+  }
+  @else {
+	#{$property}: $value;
+  }
+}

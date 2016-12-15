@@ -1,0 +1,119 @@
+// @mixin get-css
+// export css property from SASS map
+//
+// @version:			1.0
+// @date:				24.01.2015
+// @author:				jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin get-css($map, $one: false, $multiple: 1, $value: false, $operation: false) {
+  $multiple-values: (
+  	padding-top,
+  	padding-bottom,
+  	padding-left,
+  	padding-right,
+	margin-top,
+	margin-bottom,
+	margin-left,
+	margin-right,
+  );
+
+  @each $property, $source in $map {
+	$all-property: true;
+
+	@if $one != false {
+	  $all-property: false;
+	}
+
+	@if $one == $property {
+	  $all-property: true;
+	}
+
+	@if $all-property {
+	  @if $property == 'animation' {
+		@include animation($source);
+	  }
+	  @else if $property == 'transform' {
+		@include transform($source);
+	  }
+	  @else if $property == 'transition' {
+		@include transition($source);
+	  }
+	  @else if $property == 'border-radius' {
+		@include border-radius($source);
+	  }
+	  @else if $property == 'opacity' {
+		@include opacity($source);
+	  }
+	  @else if $property == 'font-family' {
+		@if $source != 'inherit' {
+		  @include font-family($source);
+		} @else {
+		  font-family: $source;
+		}
+	  }
+	  @else if $property == 'font' {
+		@include font($font-size: nth($source, 1), $line-height: nth($source, 2), $modifier: $operation);
+	  }
+	  @else if $property == 'font-size' {
+		@if length($source) == 2 {
+		  $source-font-size: ceil(nth($source, 1) * $multiple);
+		  $source-important: nth($source, 2);
+		  @include font-size($source-font-size, $source-important, $operation);
+		} @else {
+		  $source: ceil($source * $multiple);
+		  @include font-size($font-size: $source, $modifier: $operation)
+		}
+	  }
+	  @else if $property == 'line-height' {
+		@if length($source) == 2 {
+		  $source-line-height: ceil(nth($source, 1) * $multiple);
+		  $source-font-size: ceil(nth($source, 2) * $multiple);
+
+		  @include line-height($line-height: $source-line-height, $font-size: $source-font-size, $modifier: $operation);
+		} @elseif length($source) == 3 {
+		  $source-line-height: ceil(nth($source, 1) * $multiple);
+		  $source-font-size: ceil(nth($source, 2) * $multiple);
+		  $source-important: nth($source, 3);
+
+		  @include line-height($source-line-height, $source-font-size, $source-important, $operation);
+		} @else {
+		  $source: ceil($source * $multiple);
+		  line-height: $source;
+		}
+	  }
+	  @else {
+		@if $property != '' {
+		  // overeni, zda je mozne pouzit nasobic
+		  @if index($multiple-values, $property) != null {
+
+
+			@if $value == false {
+			  $source: ceil($source * $multiple);
+			}
+			@else {
+			  @if $operation == '+' {
+				$source: $source + $value;
+			  }
+
+			  @if $operation == '-' {
+				$source: $source - $value;
+			  }
+
+			  @if $operation == '*' {
+				$source: $source * $value;
+			  }
+
+			  @if $operation == '/' {
+				$source: $source / $value;
+			  }
+			}
+
+		  }
+
+		  #{$property}: $source;
+		}
+	  }
+	}
+  }
+}

@@ -1,0 +1,21 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font
+//
+// @author:		jbe
+// @date:		12.06.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin font($font-size, $line-height, $font-family: false, $font-weight: false, $important: false, $modifier: false) {
+
+  @include font-size($font-size, $important, $modifier);
+  @include line-height($line-height, $font-size, $important, $modifier);
+
+  @if $font-family {
+	@include font-family($font-family);
+  }
+
+  @if $font-weight {
+	font-weight: $font-weight;
+  }
+}

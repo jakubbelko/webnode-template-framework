@@ -1,0 +1,37 @@
+// Mixin pro pozicování claimu v sekcích
+
+@mixin claim-position($position-x: center, $position-y: center, $claim: h1) {
+
+  @if $position-y == top {
+	vertical-align: top;
+  }
+
+  @if $position-y == center {
+	vertical-align: middle;
+  }
+
+  @if $position-y == bottom {
+	vertical-align: bottom;
+  }
+
+  #{$claim} {
+	@if $position-x == left {
+	  text-align: left;
+	  float: left;
+	  margin: 40px 0;
+	}
+
+	@if $position-x == center {
+	  text-align: center;
+	  margin: 40px auto;
+	}
+
+	@if $position-x == right {
+	  text-align: right;
+	  float: right;
+	  margin: 40px 0;
+	}
+
+	@content;
+  }
+}

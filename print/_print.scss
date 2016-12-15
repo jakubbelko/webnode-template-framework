@@ -1,0 +1,256 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// print.scss
+//
+// Globalni tiskove styly. Ke zvazeni, zda nektere upravy nedat primo ke konkretnim ui-kitum
+//
+// version:         1.0
+// date:            30.11.2015
+// author:			jma
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin not-for-print() {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+$max-width-for-print: 1400px;
+
+@media print {
+
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  p {
+	color: #000 !important;
+	background: #fff !important;
+  }
+
+  * {
+	background-image: none !important;
+	background-color: transparent !important;
+	// Solving some problems with print on elements with transitions set
+	-webkit-transition: none !important;
+	transition: none !important;
+  }
+
+  a, a:visited {
+	color: #000 !important;
+  }
+
+  .button-01,
+  .button-02,
+  .file-01,
+  .file-02 {
+	a, a:visited {
+	  border-color: #000 !important;
+	}
+  }
+
+  embed {
+	color: #000 !important;
+  }
+
+  #wrapper {
+	max-width: $max-width-for-print !important;
+  }
+
+  #menu,
+  #menu-mobile,
+  #menu-overlay,
+  .section-bg-overlay,
+  .lang-select,
+  .back-to-top {
+	@include not-for-print();
+  }
+
+  .section-bg-layer {
+	background-color: #fff !important;
+	background-image: none !important;
+  }
+
+  .section-inner {
+	margin: 0 !important;
+	padding: 10px 0 0 0 !important;
+  }
+
+  .claim-table {
+	min-width: 100px;
+	text-align: left !important;
+	h1, .subclaim {
+	  text-align: left !important;
+	  span {
+		padding-left: 0 !important;
+	  }
+	}
+  }
+
+  .claim-table,
+  .heading-table {
+	.claim-default,
+	.claim-default-inv,
+	.claim-bg,
+	.claim-bg-inv,
+	.claim-color,
+	.claim-color-text,
+	.claim-color-inv,
+	.claim-color-alpha,
+	.claim-gray {
+	  > span > span  {
+		color: #000 !important;
+		box-shadow: none !important;
+		text-shadow: none !important;
+	  }
+	}
+	.claim-borders {
+	  > span > span  {
+		color: #000 !important;
+		border-top-color: #000 !important;
+		border-bottom-color: #000 !important;
+	  }
+	}
+	.section-inner {
+	  padding: 0 !important;
+	}
+  }
+
+  h1 > span > span > span {
+	//	There is problem when printing box shadow, prints as black.
+	//  Solution using -webkit-filter: blur(0); works, but results in low-res text,
+	//	so I decided not to print box shadow at all, together with claim styles unification
+	box-shadow: none !important;
+	text-shadow: none !important;
+  }
+
+  .header {
+	border-bottom: 1px solid #000 !important;
+	.header-claim,
+	.navline {
+	  position: relative !important;
+	  top: initial !important;
+	  left: initial !important;
+	  right: initial !important;
+	  bottom: initial !important;
+	  text-align: left !important;
+	  color: #000 !important;
+	  background: none !important;
+	  padding-top: 0 !important;
+	  padding-bottom: 0 !important;
+	}
+  }
+
+  .header-01 .nav-line {
+	background: #fff !important;
+	position: relative !important;
+	top: initial !important;
+	left: initial !important;
+	bottom: initial !important;
+	height: 70px !important;
+  }
+
+  .header.fullscreen {
+	height: auto !important;
+	max-height: 100% !important;
+  }
+
+  .logo {
+	max-width: 100% !important;
+	overflow: visible !important;
+	.logo-content {
+	  text-shadow: none !important;
+	}
+	.text-content  {
+	  color: #000 !important;
+	  font-size: 22px !important;
+	  line-height: 55px !important;
+
+	}
+	embed {
+	  color: #000 !important;
+	  max-height: 40px !important;
+	}
+  }
+
+  .section-black,
+  .section-blue,
+  .section-cyan,
+  .section-gray,
+  .section-green,
+  .section-media,
+  .section-media-light,
+  .section-mint,
+  .section-orange,
+  .section-pink,
+  .section-purple,
+  .section-red,
+  .section-white,
+  .section-white-red,
+  .section-white-blue,
+  .section-black-red,
+  .section-black-blue,
+  .section-none,
+  .section-beige,
+  .section-darkslateblue,
+  .section-purple,
+  .wsection-white,
+  .wsection-gray,
+  .wsection-darkgray,
+  .wsection-black,
+  .wsection-media,
+  .wsection-media-inverse,
+  .wsection-media-light {
+	color: #000 !important;
+  }
+
+  // Adding URLs to links
+  .text-content,
+  .button-content {
+	a:link[href^="http://"]:after,
+	a[href^="http://"]:visited:after {
+	  content: " (" attr(href) ") ";
+	}
+	// Do not show image links
+	a[href$=".jpg"]:after,
+	a[href$=".jpeg"]:after,
+	a[href$=".gif"]:after,
+	a[href$=".png"]:after {
+	  content: " (" attr(href) ") ";
+	  display:none;
+	}
+	// Don't show links that are fragment identifiers, or use the javascript: pseudo protocol
+	a[href^="#"]:after,
+	a[href^="javascript:"]:after {
+	  content: "";
+	}
+  }
+
+  // Standard footer
+  .footer-line {
+	border-top: 1px solid #000 !important;
+  }
+
+  // Webnode.com promo footer
+  #wnd_fe_footer {
+	max-width: $max-width-for-print !important;
+	border-top: 1px solid #000 !important;
+  }
+
+  #wnd_fe_footer_left,
+  #wnd_fe_footer_left:visited {
+	margin-left: 10px !important;
+	&:before {
+	  content: "www.webnode.com  ";
+	}
+  }
+
+  #wnd_fe_footer_right {
+	display: none;
+  }
+
+}
+

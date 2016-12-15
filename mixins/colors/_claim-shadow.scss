@@ -1,0 +1,79 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin claim-shadow pro manipulaci box-shadow v claimech. Mixin box-shadow zustava obecnym mix. pro libovolne pouziti
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $shadow		- nastaveni pozice a rozmazani stinu
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jma
+// @date:		24.09.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin claim-shadow($shadow, $color-set, $map: false, $set-alpha: false, $important: false, $shadow2: false, $color-set2: false) {
+
+  $color: false;
+  $color2: false;
+  $alpha2: 1;
+  $imp: '';
+
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @if $color-set == none {
+	box-shadow: none#{$imp};
+  } @else {
+	@if $map {
+	  $color: get-map-value($map, $color-set);
+
+	  @if $color-set2 {
+		$color2: get-map-value($map, $color-set2);
+	  }
+	} @else {
+	  $color: $color-set;
+
+	  @if $color-set2 {
+		$color2: $color-set2;
+	  }
+	}
+
+	@if $color {
+	  @if $set-alpha {
+
+		$color: change_color($color, $alpha: $set-alpha);
+
+
+		@if $color-set2 {
+		  $color2: change_color($color2, $alpha: $set-alpha);
+		}
+	  }
+
+	  $alpha: alpha($color);
+
+	  @if $color-set2 {
+		$alpha2: alpha($color2);
+	  }
+
+	  @if ( $alpha < 1 or $alpha2 < 1 ) {
+		// if using alpha colors, we can put only one box shadow layer so IE bug can not be eliminated in this case
+		@include box-shadow($shadow, $color-set, $map, $set-alpha, $important, $shadow2, $color-set2);
+	  }
+	  @else {
+		// if using solid colors, we put more box shadows to eliminate IE antialiasing bug - transparent vertical line
+
+		@if $shadow2 {
+		  box-shadow: $shadow $color, $shadow2 $color2, $shadow $color, $shadow2 $color2, $shadow $color, $shadow2 $color2;
+		} @else {
+		  box-shadow: $shadow $color, $shadow $color, $shadow $color;
+		}
+
+	  }
+
+	}
+  }
+  @include border-radius(0.1px);
+
+}

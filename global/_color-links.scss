@@ -1,0 +1,53 @@
+// barvy odkazu v headings, jednotny styl ------------------------------------------------------------------------------
+
+body.wnd-cms {
+  .text,
+  .mt .text {
+	h1,
+	h2,
+	h3,
+	h4 {
+	  a, a:hover  {
+		color: inherit !important;
+		border-bottom-color: rgba(0, 0, 0, 0) !important;
+		text-decoration: none !important;
+	  }
+	}
+	p font[color] {
+	  a, a:hover  {
+		color: inherit !important;
+		border-bottom-color: inherit !important;
+	  }
+	}
+  }
+}
+
+body:not(.wnd-cms) {
+  .text,
+  .mt .text {
+	h1,
+	h2,
+	h3,
+	h4 {
+	  a:not(:hover) {
+		color: inherit !important;
+		border-bottom-color: rgba(0, 0, 0, 0) !important;
+		text-decoration: none !important;
+	  }
+	  a:hover {
+		color: inherit !important;
+		border-bottom-color: inherit !important;
+		font[color] {
+		  @include transition(all 100ms ease-in);
+		  border-bottom: 1px solid currentColor !important;
+		}
+	  }
+	}
+	p font[color] {
+	  a, a:hover {
+		color: inherit !important;
+		border-bottom-color: inherit !important;
+	  }
+	}
+  }
+}

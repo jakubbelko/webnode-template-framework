@@ -1,0 +1,19 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin border-radius
+//
+// $radius - hodnota radiusu
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @example: border-radius(topleft topright bottomright bottomleft);
+//
+// background-clip: http://tumble.sneak.co.nz/post/928998513/fixing-the-background-bleed
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin border-radius($radius) {
+  @if $radius {
+	border-radius: $radius;
+  }
+}

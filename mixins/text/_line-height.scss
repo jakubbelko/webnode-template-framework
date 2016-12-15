@@ -1,0 +1,29 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin line-height
+//
+// prevod vysky radku v PX na pomer k font-size
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin line-height($line-height, $font-size, $important: false, $modifier: false) {
+
+  @if $modifier == precise {
+
+    @if $important {
+      line-height: $line-height !important;
+    }@else{
+      line-height: $line-height;
+    }
+
+  } @else {
+
+    @if $important {
+      line-height: ceil($font-size / $line-height) * ($line-height / $font-size) !important;
+    } @else {
+      line-height: ceil($font-size / $line-height) * ($line-height / $font-size);
+    }
+  }
+}

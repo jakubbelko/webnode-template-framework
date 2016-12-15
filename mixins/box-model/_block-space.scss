@@ -1,0 +1,68 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin block-space
+//
+// z mapy $wtf-blocks-space vygeneruje responsivni padding pro bloky
+//
+// $top-bottom - nasobek pro padding top a bottom
+// $left-right - nasobek pro padding left a right
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin block-space($top: 1, $right: 1, $bottom: false, $left: false, $important: false) {
+  $t: '';
+  $r: '';
+  $b: '';
+  $l: '';
+
+  @each $block in $wtf-blocks-space {
+	@if $bottom {
+	  $t: ceil(nth($block, 2) * $top);
+	  $b: ceil(nth($block, 2) * $bottom);
+	} @else {
+	  $t: ceil(nth($block, 2) * $top);
+	  $b: $t;
+	}
+
+	@if $left {
+	  $r: ceil(nth($block, 2) * $right);
+	  $l: ceil(nth($block, 2) * $left);
+	} @else {
+	  $r: ceil(nth($block, 2) * $right);
+	  $l: $r;
+	}
+
+	// osetreni 0px
+	@if $t == 0px {
+	  $t: 0;
+	}
+	@if $r == 0px {
+	  $r: 0;
+	}
+	@if $b == 0px {
+	  $b: 0;
+	}
+	@if $l == 0px {
+	  $l: 0;
+	}
+
+	@if( nth($block, 1) == 0 ) {
+	  @if $important {
+		padding: $t $r $b $l !important;
+	  } @else {
+		padding: $t $r $b $l;
+	  }
+	}
+	@else {
+	  @include mq(nth($block, 1)) {
+		@if $important {
+		  padding: $t $r $b $l !important;
+		} @else {
+		  padding: $t $r $b $l;
+		}
+	  }
+	}
+  }
+}

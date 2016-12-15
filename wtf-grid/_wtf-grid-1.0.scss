@@ -1,0 +1,323 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// WTF Grid 1.0
+//
+// Postaveno na SCSS (Sass), umožňuje rychle vytvořit responsivní/adaptivní grid jak pro fixní nebo fluidní layout,
+// relativní i pevné mezery. WTF Grid vychází z Profound gridu, který začal zlobit v Sass 3.4.
+//
+// Zůstalo zachováno použití záporných marginů pro umístění sloupců, aby se zabránilo subpixel zaokrouholování,
+// které obvykle rozkládají layout v některých prohlížečích.
+//
+// Je podporováno zanořování sloupců bez nutnosti obnovit mřížku na každé úrovni.
+//
+// Inspirace:		http://www.profoundgrid.com
+//
+// Licence:			WTFPL (http://www.wtfpl.net/)
+//
+// @author:			jbe
+// @date:			11.09.2014
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Grid settings -------------------------------------------------------------------------------------------------------
+
+$wtf-grid-columns:						12 !default;						// min. 2 - n (even)
+$wtf-grid-width:						100% !default;						// %, px
+$wtf-grid-gutter:						2% !default;						// %, px
+$wtf-grid-margin:						1% !default;						// %, px, auto
+
+// Grid math -----------------------------------------------------------------------------------------------------------
+
+@function element-width($column-index) {
+  @if( $wtf-grid-width == 100% ) {
+	$value: ( ( (100% + $wtf-grid-gutter) / $wtf-grid-columns ) * $column-index ) - $wtf-grid-gutter;
+	$value: $value * 100;
+	$rounded-value: round($value) / 100;
+	@return $rounded-value;
+  }
+  @else {
+	$value: ( ( ($wtf-grid-width + $wtf-grid-gutter) / $wtf-grid-columns ) * $column-index ) - $wtf-grid-gutter;
+	@return $value;
+  }
+}
+
+@function column-width() {
+  @if( $wtf-grid-width == 100% ) {
+	$value: ( ( ( 100% + $wtf-grid-gutter ) / $wtf-grid-columns ) ) - $wtf-grid-gutter;
+	$value: $value * 100;
+	$rounded-value: ( round($value) / 100 ) * 1%;
+	@return $rounded-value;
+  }
+  @else {
+	$value: ($wtf-grid-width - ( $wtf-grid-gutter * ( $wtf-grid-columns - 1 ) ) ) / $wtf-grid-columns;
+	@return $value;
+  }
+}
+
+@function container-width() {
+  @if( $wtf-grid-width == 100% ) {
+	@if( $wtf-grid-margin == 'auto' ) {
+	  @return 100%;
+	}
+	@return (100% - (2 * $wtf-grid-margin));
+  }
+  @else {
+	@return $wtf-grid-width;
+  }
+}
+
+// Grid mixins ---------------------------------------------------------------------------------------------------------
+
+@mixin grid-clearfix {
+  &:before,
+  &:after {
+	content: "";
+	display: table;
+  }
+  &:after {
+	clear: both;
+  }
+}
+
+
+@mixin container() {
+  width: container-width();
+  margin: 0 $wtf-grid-margin;
+}
+
+
+@mixin column($columns-width, $padding-columns: false) {
+  float: left;
+  margin-right: -100%;
+  $width: element-width($columns-width);
+  width: $width;
+
+  @if( $padding-columns ) {
+	@include push($padding-columns);
+  }
+}
+
+
+@mixin push($column-index) {
+  $width: 0%;
+  @if( $wtf-grid-width == 100% ) {
+	$width: ($wtf-grid-gutter + element-width($column-index));
+  }
+  @else {
+	$width: ($wtf-grid-gutter + element-width($column-index));
+  }
+  margin-left: $width;
+}
+
+
+@mixin grid-positions($column-selector, $element-width) {
+
+  $cols-per-row: floor($wtf-grid-columns / $element-width);
+
+  // create rule for each element
+  @for $i from 1 through $cols-per-row {
+
+	#{$column-selector}:nth-child(#{$cols-per-row}n+#{$i}){
+	  @include push(( ($i - 1) * $element-width ));
+	  margin-top: ($wtf-grid-margin / 2);
+	  margin-bottom: ($wtf-grid-margin / 2 );
+
+	  @if ($i == 1) {
+		clear: both;
+		@if( mixin-exists(clearfix) ) {
+		  @include clearfix;
+		}
+		@else {
+		  @include grid-clearfix;
+		}
+	  }
+	  @else {
+		clear: none;
+	  }
+	}
+  }
+}
+
+
+// @mixin blocks-grid --------------------------------------------------------------------------------------------------
+
+// $block - class trida pro bloky uvnitr containeru
+// $grid-settings - sass mapa s hodnotami breakpointů a počtem bloků v jednom řádku
+
+// ukázka použití
+
+//		$wtf-gallery: (
+//			480px	2,
+//			600px	3,
+//			768px	4,
+//			900px	6
+//		);
+
+
+//		.gallery {
+//			...
+//
+//			.photo {
+//				...
+//			}
+//
+//			@include blocks-grid('.photo', $wtf-gallery);
+//		}
+
+
+@mixin blocks-grid($block, $grid-settings) {
+
+  @include grid-positions($block, $wtf-grid-columns);
+
+  #{$block} {
+	@include column($wtf-grid-columns);
+  }
+
+  @each $grid in $grid-settings {
+	$column: $wtf-grid-columns / nth($grid, 2);
+
+	@include mq(nth($grid, 1)) {
+	  @include grid-positions($block, $column);
+
+	  #{$block} {
+		@include column($column);
+	  }
+	}
+  }
+}
+
+
+@mixin grid-column-width($columns-width) {
+  $width: element-width($columns-width);
+  width: $width;
+}
+
+@mixin blocks-width($width-settings) {
+
+  @include grid-column-width($wtf-grid-columns);
+
+  @each $width in $width-settings {
+	$column: $wtf-grid-columns / nth($width, 2);
+
+	@include mq(nth($width, 1)) {
+	  @include grid-column-width($column);
+	}
+  }
+}
+
+//////////// MIXINS FOR CENTERED MICROTEMPLATE CELLS
+
+@mixin centered-element-margins($column-count){
+
+
+  @for $i from 1 through $column-count {
+
+	&:nth-child(#{$column-count}n + #{$i}){
+
+	  @if $i == $column-count {
+		margin-right: 0;
+	  }
+	  @else{
+		margin-right: $wtf-grid-gutter;
+	  }
+	}
+  }
+
+  &:last-child {
+	margin-right: 0;
+  }
+
+}
+
+
+
+@function centered-element-width($column-count) {
+
+  $value: ( $wtf-grid-width - (($column-count - 1) * $wtf-grid-gutter)) / $column-count;
+  @return $value;
+}
+
+
+
+@mixin centered-column($column-count, $padding-columns: false) {
+
+  $width: centered-element-width($column-count);
+  width: $width;
+  margin-top: ($wtf-grid-margin / 2);
+  margin-bottom: ($wtf-grid-margin / 2 );
+
+  @include centered-element-margins($column-count);
+}
+
+
+
+@mixin centered-grid($block, $grid-settings) {
+
+  #{$block} {
+	@include centered-column($wtf-grid-columns / $wtf-grid-columns);
+  }
+
+  @each $grid in $grid-settings {
+
+	@include mq(nth($grid, 1)) {
+
+	  #{$block} {
+		@include centered-column(nth($grid, 2));
+	  }
+	}
+  }
+}
+
+
+
+
+
+@mixin centered-grid-parent($block, $column-width) {
+
+  $column-count: $wtf-grid-columns / $column-width;
+
+  #{$block} {
+	@include centered-column($column-count);
+  }
+}
+
+
+@mixin blocks-grid-parent($block, $column-width) {
+
+  @include grid-positions($block, $column-width);
+
+  #{$block} {
+	@include column($column-width);
+  }
+}
+
+/// SUPERMIXIN
+
+@mixin use-grid($grid-type, $block, $grid-settings){
+
+  $type-switch: type-of($grid-settings);
+
+  @if $type-switch == "list" {
+
+	@if $grid-type == 'centered' {
+	  @include centered-grid($block, $grid-settings);
+	}
+	@else if $grid-type == 'blocks' {
+	  @include blocks-grid($block, $grid-settings);
+	}
+	@else {
+	  @include blocks-grid($block, $grid-settings);
+	}
+  }
+  @else {
+
+	@if $grid-type == 'centered' {
+	  @include centered-grid-parent($block, $grid-settings);
+	}
+	@else if $grid-type == 'blocks' {
+	  @include blocks-grid-parent($block, $grid-settings);
+	}
+	@else {
+	  @include blocks-grid-parent($block, $grid-settings);
+	}
+  }
+}

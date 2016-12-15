@@ -1,0 +1,38 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin placeholder
+//
+// nastavitelne vlastnosti:
+//	- color
+//	- font-size
+//	- font-style
+//	- font-weight
+//	- letter-spacing
+//	- line-height
+//	- padding
+//	- text-align
+//	- text-decoration
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @source: http://blog.teamtreehouse.com/the-css3-placeholder-pseudo-element
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin placeholder() {
+  &::-webkit-input-placeholder {
+	@content;
+  }
+
+  &:-moz-placeholder {
+	@content;
+  }
+
+  &::-moz-placeholder {
+	@content;
+  }
+
+  &:-ms-input-placeholder {
+	@content;
+  }
+}

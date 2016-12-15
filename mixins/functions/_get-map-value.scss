@@ -1,0 +1,30 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @function get-map-value
+//
+// $map - id mapy, z ktere se maja nacist daa
+// $map-id - promena, ktera se ma z mapy nacist
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@function get-map-value($map, $key) {
+  $key-in-map: map-has-key($map, $key);
+
+  @if $key-in-map == true {
+	$color-setting: map_get($map, $key);
+	$set-alpha: false;
+
+	$color: nth($color-setting, 1);
+
+	@if length($color-setting) == 2 {
+	  $set-alpha: nth($color-setting, 2);
+	  $color: color-alpha($color, $set-alpha);
+	}
+
+	@return $color;
+  } @else {
+	@return false;
+  }
+}

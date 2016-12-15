@@ -1,0 +1,26 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin opacity
+//
+// auto fallback for opacity
+//
+// $value:		0 - 1
+//
+// @author:		jbe
+// @date:		12.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin opacity($value, $important: false) {
+  $imp: '';
+  @if $important {
+    $imp: ' !important';
+  }
+
+  @if $value {
+	@if $wtf-ie8-support {
+	  $filter: $value * 100;
+	  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$filter})"#{$imp};
+	}
+    opacity: $value#{$imp};
+  }
+}

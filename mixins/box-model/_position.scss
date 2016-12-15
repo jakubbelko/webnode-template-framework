@@ -1,0 +1,29 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin position
+//
+// @author:		jbe
+// @date:		16.02.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin position($type: absolute, $top: 0, $left: 0, $bottom: false, $right: false) {
+  @if $type {
+	position: $type;
+  }
+
+  @if $top {
+	top: $top;
+  }
+
+  @if $left {
+	left: $left;
+  }
+
+  @if $bottom {
+	bottom: $bottom;
+  }
+
+  @if $right {
+	right: $right;
+  }
+}

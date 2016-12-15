@@ -1,0 +1,119 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-family
+//
+// @author:		jma
+// @date:		18.04.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Mixin pro definici font-family vcetne fallbacku.
+// Vola se s promennou dle prvniho klice sass mapy nize, tj. např. @include font-family('Abril FatFace');
+//
+// Vystupem mixinu je styl pro aktualni selektor, obsahujici zapis font-family vcetne spravneho nazvu pisma
+// a vcetne fallbackovych pisem. Vyhodou je sprava "realnych" nazvu pisem a fallbacků pro tato pisma na jednom
+// miste a to zde. Zaroven vhodnym pojmenovanim "realneho" nazvu pisma lze zajistit zda se pismo vezme z Typekitu
+// nebo se pouzije lokalni sada pisma. Krome stylu pro aktualni selektor je vygenerovan jeste styl s predrazenou
+// tridou .wnd-fonts-fallback pro zajisteni tzv. nuceneho fallbacku.
+//
+// Mixin vyuziva funkci font-family($font-family,$type) ktera zajistuje cteni ze sass podmapy v mape pisma.
+// Tato funkce je krome volani z mixinu font-family volana jeste z base-style.css kazdeho ui-kitu, kde je potreba
+// ziskat spravny zapis jen pro fallbackova pisma a pak spravny zapis pro pismo vcetne fallbackovych pisem.
+
+$font-families: (
+		'Abril FatFace': (
+				realname: 'Abril FatFace',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Brandon Grotesque': (
+				realname: 'brandon-grotesque',
+				fallback: ('Arial', sans-serif),
+				specialfallback: ('Noto Sans', 'Arial', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Arial', sans-serif)
+		),
+		'Fira Sans': (
+				realname: 'fira-sans',
+				fallback: ('Trebuchet MS', sans-serif),
+				specialfallback: ('Noto Sans', 'Trebuchet MS', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Trebuchet MS', sans-serif)
+		),
+		'Lobster': (
+				realname: 'Lobster',
+				fallback: ('Georgia', serif),
+				specialfallback: ('Noto Serif', 'Georgia', serif),
+				jpfallback: ('Noto Sans Japanese', 'Georgia', serif)
+		),
+		'Lora': (
+				realname: 'Lora',
+				fallback: ('Georgia', serif),
+				specialfallback: ('Noto Serif', 'Georgia', serif),
+				jpfallback: ('Noto Sans Japanese', 'Georgia', serif)
+		),
+		'Open Sans': (
+				realname: 'Open Sans',
+				fallback: ('Trebuchet MS', sans-serif),
+				specialfallback: ('Noto Sans', 'Trebuchet MS', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Trebuchet MS', sans-serif)
+		),
+		'Playfair Display': (
+				realname: 'Playfair Display',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Proxima Nova': (
+				realname: 'proxima-nova',
+				fallback: ('Helvetica', 'Arial', sans-serif),
+				specialfallback: ('Noto Sans', 'Helvetica', 'Arial', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Helvetica', 'Arial', sans-serif)
+		),
+		'PT Serif': (
+				realname: 'pt-serif',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Reklame Script': (
+				realname: 'reklame-script',
+				fallback: ('Georgia', serif),
+				specialfallback: ('Noto Serif', 'Georgia', serif),
+				jpfallback: ('Noto Sans Japanese', 'Georgia', serif)
+		),
+		'Ribeye Marrow': (
+				realname: 'Ribeye Marrow',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Roboto': (
+				realname: 'Roboto',
+				fallback: ('Arial', sans-serif),
+				specialfallback: ('Noto Sans', 'Arial', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Arial', sans-serif)
+		),
+);
+
+@function get-font-family($font-family,$type) {
+  @return map-get(map-get($font-families, $font-family),$type);
+}
+
+@mixin font-family($font-family, $type: false) {
+  @if $type == normal {
+	font-family: get-font-family($font-family, 'realname'), get-font-family($font-family, 'fallback');
+  } @else if $type == special {
+	font-family: get-font-family($font-family, 'specialfallback');
+  } @else if $type == japanese {
+	font-family: get-font-family($font-family, 'jpfallback');
+  } @else {
+	font-family: get-font-family($font-family, 'realname'), get-font-family($font-family, 'fallback');
+
+	.wnd-fonts-fallback & {
+	  font-family: get-font-family($font-family, 'specialfallback');
+	}
+
+	html[lang='ja'] .wnd-fonts-fallback & {
+	  font-family: get-font-family($font-family, 'jpfallback');
+	}
+  }
+}

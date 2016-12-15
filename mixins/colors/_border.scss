@@ -1,0 +1,93 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin border
+//
+// $border		- sirka cary [px, none, false], [top right bottom left]
+// $style		- styl cary [solid, dotted, dashed, none]
+// $color		- barva v formatu HEX, prevod na rgb se provadi automaticky
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin border($border: 1px, $style: solid, $color-set: false, $map: false, $important: false, $set-alpha: false) {
+  $imp: '';
+  $color: '';
+
+  @if $important {
+    $imp: ' !important';
+  }
+
+  @if $border == none {
+	border: none#{$imp};
+  }
+  @else {
+
+	@if $map {
+	  $color: get-map-value($map, $color-set);
+	} @else {
+	  $color: $color-set;
+	}
+
+	@if $color {
+	  @if $set-alpha {
+		$color: change_color($color, $alpha: $set-alpha);
+	  }
+
+	  @if length($border) == 1 {
+		border: $border $style $color#{$imp};
+	  }
+
+	  @if length($border) == 2 {
+		$top-bottom: nth($border, 1);
+		$right-left: nth($border, 2);
+
+		@if $top-bottom {
+		  border-top: $top-bottom $style $color#{$imp};
+		  border-bottom: $top-bottom $style $color#{$imp};
+		}
+		@if $right-left {
+		  border-right: $right-left $style $color#{$imp};
+		  border-left: $right-left $style $color#{$imp};
+		}
+	  }
+
+	  @if length($border) == 3 {
+		$top: nth($border, 1);
+		$right-left: nth($border, 2);
+		$bottom: nth($border, 3);
+
+		@if $top {
+		  border-top: $top $style $color#{$imp};
+		}
+		@if $right-left {
+		  border-right: $right-left $style $color#{$imp};
+		  border-left: $right-left $style $color#{$imp};
+		}
+		@if $bottom {
+		  border-bottom: $bottom $style $color#{$imp};
+		}
+	  }
+
+	  @if length($border) == 4 {
+		$top: nth($border, 1);
+		$right: nth($border, 2);
+		$bottom: nth($border, 3);
+		$left: nth($border, 4);
+
+		@if $top {
+		  border-top: $top $style $color#{$imp};
+		}
+		@if $right {
+		  border-right: $right $style $color#{$imp};
+		}
+		@if $bottom {
+		  border-bottom: $bottom $style $color#{$imp};
+		}
+		@if $left {
+		  border-left: $left $style $color#{$imp};
+		}
+	  }
+	}
+  }
+}

@@ -1,0 +1,61 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin bg-color
+//
+// barva pozadi s automatickym fallbackem pro RGBa
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin bg-color($color-set, $map: false, $set-alpha: false, $important: false) {
+  $color: false;
+  $ready: false;
+  $imp: '';
+
+  @if $important {
+    $imp: ' !important';
+  }
+
+  // nacitani z mapy barev
+  @if $map {
+    $color: get-map-value($map, $color-set);
+  } @else { // barva je zadana primo
+    $color: $color-set;
+  }
+
+  @if $color {
+	@if $color != none {
+
+	  @if $set-alpha {
+		$color: change_color($color, $alpha: $set-alpha);
+	  }
+
+	  $alpha: alpha($color);
+
+	  @if $alpha < 1 {
+		@if $wtf-ie8-support {
+		  $color-rgb: change_color($color, $alpha: 1);
+		  background-color: $color-rgb#{$imp};
+		}
+		background-color: $color#{$imp};
+
+		@if $wtf-ie8-support {
+		  $color-ie: ie-hex-str($color);
+		  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$color-ie}', endColorstr='#{$color-ie}', GradientType=0)#{$imp};
+		  ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$color-ie}', endColorstr='#{$color-ie}', GradientType=0)#{$imp};
+		}
+	  } @else {
+		background-color: $color#{$imp};
+	  }
+	}
+	@else {
+	  background-color: transparent;
+	}
+  }
+}

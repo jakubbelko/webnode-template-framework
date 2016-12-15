@@ -1,0 +1,135 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin blockquote-lang
+//
+// @author:		pan
+// @date:		26.09.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin blockquote-lang($blockquote-lang-map) {
+
+  $lang-list: ();
+
+  // pruchod top-levelem mapy
+
+  @each $lang-item in $blockquote-lang-map {
+
+	$language: nth($lang-item, 1);
+	$lang-data: nth($lang-item, 2);
+
+	// inicializace selektor pole
+
+	$selector: ();
+	$skip-flag: false;
+
+  	// pokud je mapa u soucasne iterovaneho jazyka jednourovnova, musime zjistit, zda nejde o "stackovaci definici" (skip: true)
+
+	@if map-depth($lang-data) == 1 {
+
+	  @each $lang-data-item in $lang-data {
+
+		// pokud zjistime skip flag, zapise se jazyk do pole jazyku, ktere bude vyplivnuto pro prvni nasledujici uplnou definici
+
+		@if nth($lang-data-item, 1) == "skip" {
+
+		  $lang-list: append($lang-list, $language);
+		  $skip-flag: true; // nastaveni skip flagu, aby byl zbytek kodu v loopu ignorovan (zaridi nasledujici if)
+
+		}
+	  }
+
+	  @if $skip-flag == false {
+		$lang-list: append($lang-list, $language);
+	  }
+
+	}@else{
+
+	  $lang-list: append($lang-list, $language);
+
+	}
+
+	// pokud jsme u plne definice...
+
+	@if $skip-flag == false {
+
+	  // konstrukce selektoru
+
+	  @if length($lang-list) == 1 {
+
+		$selector: unquote('html[lang="#{$language}"] &');
+
+	  }@else{
+
+		@each $item in $lang-list {
+
+		  $selector: $selector unquote('html[lang="#{$item}"] &');
+
+		  @if $item != nth($lang-list, length($lang-list)) {
+			$selector: $selector unquote(',');
+		  }
+
+		}
+
+	  }
+
+	  // vypsani selektoru, dalsi logika nasleduje uvnitr
+
+	  #{$selector}{
+		//blockquote:before {
+
+		  // check, zda je mapa jednourovnova (a nebude potreba resit breakpointy)
+
+		  @if map-depth($lang-data) == 1 {
+
+		  	@include blockquote-lang-css($lang-data);
+
+
+		  // pokud ma vice urovni, zpracuji se breakpointy
+
+		  }@else{
+
+			@each $lang-data-item in $lang-data {
+
+			  $breakpoint: nth($lang-data-item, 1);
+			  $lang-data-block: nth($lang-data-item, 2);
+
+			  @if ($breakpoint == 0) {
+
+				@include blockquote-lang-css($lang-data-block);
+
+			  }@else{
+
+				@include mq($breakpoint) {
+
+				  @include blockquote-lang-css($lang-data-block);
+
+				}
+			  }
+			}
+		  }
+		//}
+	  }
+
+	  $lang-list: ();
+
+	}
+  }
+}
+
+@mixin blockquote-lang-css($css-map){
+
+  @each $item in $css-map {
+
+	$rule-name: nth($item, 1);
+	$rule-value: nth($item, 2);
+
+	@if $rule-name == "font-family" and $rule-value != "serif" and $rule-value != "sans-serif" {
+	  @include font-family($rule-value);
+	} @else if $rule-name == 'transform' {
+	  @include transform($rule-value);
+	} @else {
+	  #{$rule-name}: #{$rule-value};
+	}
+
+  }
+}

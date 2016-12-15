@@ -1,0 +1,36 @@
+// @mixin responsive
+// generate resonsive css from SASS map
+//
+// @version:			1.0
+// @date:				24.01.2014
+// @author:				jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin responsive($maps, $one: false, $multiple: 1, $step: false, $value: false, $operation: false) {
+  $step-in: 0;
+
+  @each $bp, $map in $maps {
+
+	@if $step == false {
+
+	  @if $bp == 0 {
+		@include get-css($map, $one, $multiple, $value, $operation);
+	  } @else if type-of($bp) == string {
+		@include mqd($bp) {
+		  @include get-css($map, $one, $multiple, $value, $operation);
+		}
+	  } @else {
+		@include mq($bp) {
+		  @include get-css($map, $one, $multiple, $value, $operation);
+		}
+	  }
+
+	} @else {
+	  @if $step == $step-in {
+		@include get-css($map, $one, $multiple, $value, $operation);
+	  }
+	}
+
+	$step-in: $step-in + 1;
+  }
+}

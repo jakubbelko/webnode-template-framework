@@ -1,0 +1,61 @@
+// ---------------------------------------------------------------------------------------------------------------------
+//
+// Zarovnání na mobilních zařízeních
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+@include mq($max-width: $wtf-text-indent-viewport - 1) {
+  .text,
+  .blog {
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	li {
+	  margin-left: 0 !important;
+	  margin-right: 0 !important;
+	}
+  }
+}
+
+
+@include mq($max-width: $wtf-text-align-viewport - 1) {
+
+  .text,
+  .blog {
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	ul li,
+	ol li {
+	  &[style*="text-align: right;"],
+	  &[style*="text-align:right;"],
+	  &[style*="text-align: right"],
+	  &[style*="text-align:right"],
+	  &.wnd-align-right {
+		text-align: left !important;
+	  }
+	}
+  }
+
+  // oprava zarovnani v micro template, dříve řešena pomocí @extend %mt v jednotlivych mikrosablonach
+  // Všechny micro tempalte jsou označeny class .mt
+
+  .mt {
+	.text,
+	.blog {
+	  p,
+	  h1,
+	  h2,
+	  h3,
+	  h4,
+	  ul li,
+	  ol li {
+		text-align: inherit !important;
+	  }
+	}
+  }
+}

@@ -1,0 +1,37 @@
+
+// zarovnani obrazku ---------------------------------------------------------------------------------------------------
+.wnd-float-left,
+.wnd-float-right {
+  position: relative;
+
+  @include mq($max-width: 320px) {
+	min-width: 40%;
+  }
+
+  @include mq($max-width: 480px) {
+	min-width: 30%;
+  }
+
+  + .text {
+	ul,
+	blockquote {
+	  display: table;
+	}
+
+	ol {
+	  display: table-cell;
+	}
+  }
+}
+
+.column-content {
+  .wnd-float-left {
+	left: auto;
+	margin-left: 0 !important;
+  }
+
+  .wnd-float-right {
+	right: auto;
+	margin-right: 0 !important;
+  }
+}

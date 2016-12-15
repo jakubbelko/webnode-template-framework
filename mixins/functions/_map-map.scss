@@ -1,0 +1,18 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @function map-map
+//
+// vrati pozadovanou promennou z vnorene mapy
+// $parent	- oznaceni rodicovske mapy
+// $child	- identifikator vnorene mapy
+// $value	- pozadovana promena
+//
+// @author:		jbe
+// @date:		19.03.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
+@function map-map($parent, $child, $value) {
+  @return map-get(map-get($parent, $child), $value);
+}

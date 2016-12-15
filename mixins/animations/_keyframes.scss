@@ -1,0 +1,28 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin keyframes
+//
+// $name - nazev animace
+// do slozenych zavorek pak zapis prubeh animace
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} {
+	@content;
+  }
+  @-moz-keyframes #{$name} {
+	@content;
+  }
+  @-ms-keyframes #{$name} {
+	@content;
+  }
+  @-o-keyframes #{$name} {
+	@content;
+  }
+  @keyframes #{$name} {
+	@content;
+  }
+}

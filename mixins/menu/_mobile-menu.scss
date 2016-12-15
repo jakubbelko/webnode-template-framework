@@ -1,0 +1,291 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin mobile-menu, @mixin mobile-menu-pos, @mixin layout slide
+//
+//
+// @author:		pan
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  @mixin mobile-menu-pos
+//
+//  Mixin slouzi ke vlastni konstrukci stylu pro mobilni menu dle promennych v configu
+//	Urcuje odkud bude menu vyjizdet a zda bude telo stranky slidovat spolu s menu
+//	Je volan mixinem "mobile-menu"
+//	Pouziva se v definici stylu mobilniho menu
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
+@mixin mobile-menu-pos($pos, $width){
+
+  // MENU SLIDING FROM TOP  ////////////////////////////////////////////////////////////////////////////////////////////
+
+  @if $pos == top  {
+
+	@include transform(translate3d(0, -100%, 0));
+	@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	}@else{
+
+	  width: $width;
+	  left: auto;
+	  right: 0;
+	}
+
+	&.open {
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  display: block;
+	}
+
+	// MENU SLIDING FROM BOTTOM  ///////////////////////////////////////////////////////////////////////////////////////
+
+  }@else if $pos == bottom {
+
+	@include transform(translate3d(0, 100%, 0));
+	@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	}@else{
+
+	  left: auto;
+	  right: 0;
+	  width: $width;
+	}
+
+	&.open {
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  display: block;
+	}
+
+	// MENU SLIDING FROM LEFT ////////////////////////////////////////////////////////////////////////////////////////////
+
+  }@else if $pos == left {
+
+	@if $width == 100% {
+
+	  @include transform(translate3d(-100%, 0, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	  width: 100%;
+	  left: 0;
+	  right: 0;
+
+	  &.open {
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+		display: block;
+	  }
+
+	}@else{
+
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(left 200ms ease-in, box-shadow 200ms ease-in);
+
+	  left: ($width * -1);
+	  width: $width;
+
+	  &.open {
+		@include transition(left 200ms ease-in, box-shadow 200ms ease-in);
+		left: 0;
+	  }
+	}
+
+	// MENU SLIDING FROM RIGHT /////////////////////////////////////////////////////////////////////////////////////////
+
+  } @else if $pos == right {
+
+	@if $width == 100% {
+
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  @include transform(translate3d(100%, 0, 0));
+
+	  width: 100%;
+	  left: 0;
+	  right: 0;
+
+	  &.open {
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+		display: block;
+	  }
+
+	} @else {
+
+	  // BODY SLIDING WITH MENU ////////////////////////////////////////////////////////////////////////////////////////
+
+	  @if $slide-body == false {
+
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(right 200ms ease-in, box-shadow 200ms ease-in);
+
+		right: ($width * -1);
+		width: $width;
+		left: auto;
+		top: 0;
+
+		&.open {
+		  @include transition(right 200ms ease-in, box-shadow 200ms ease-in);
+		  right: 0;
+		  display: block;
+		}
+
+		// BODY NOT SLIDING WITH MENU ////////////////////////////////////////////////////////////////////////////////////
+
+	  } @else {
+
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(transform 200ms ease-in);
+
+		right: ($width * -1);
+		width: $width;
+		left: auto;
+		top: 0;
+
+		&.open {
+		  @include transform(translate3d(-100%, 0%, 0));
+		  @include transition(transform 200ms ease-in);
+		}
+	  }
+	}
+
+	// MENU FADES IN FROM CENTER ///////////////////////////////////////////////////////////////////////////////////////
+
+  } @else if $pos == center {
+
+	display: none;
+	@include opacity(0);
+	@include transition(opacity 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	} @else {
+
+	  width: $width;
+	  left: auto;
+	  right: 0;
+
+	}
+
+	&.open {
+
+	  @include opacity(1);
+	  @include transition(opacity 200ms ease-in, box-shadow 200ms ease-in);
+
+	}
+
+	// DEFAULT VALUE (TOP) /////////////////////////////////////////////////////////////////////////////////////////////
+
+  } @else {
+
+	@include transform(translate3d(0, -100%, 0));
+	@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	} @else {
+
+	  width: $width;
+	  left: auto;
+	  right: 0;
+
+	}
+
+	&.open {
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  display: block;
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  @mixin mobile-menu
+//
+//  Matersky mixin pro konstrukci responzivnich stylu pro mobilni menu
+//  Vola si na pomoc mixin "mobile-menu-pos"
+//	Pouziva se v definici stylu mobilniho menu
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+@mixin mobile-menu($menu-size-map, $menu-position) {
+
+  // pruchod media queries pomoci mapy zadane v settings
+  @each $screen-dimension, $width-value in $menu-size-map {
+
+	// pokud je aktualni hodnota 0px, zapise se vlastnost bez media queries
+	@if (nth($screen-dimension, 1) == 0px) {
+
+	  @include mobile-menu-pos($menu-position, $width-value);
+
+	  // pokud ne, vypise se vlastnost v media query
+	} @else {
+
+	  @include mq(nth($screen-dimension, 1)) {
+
+		// volani mixinu, ktery vytahne potrebne rozmery z mapy
+		@include mobile-menu-pos($menu-position, $width-value);
+
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  @mixin layout-slide
+//
+//  Mixin pro konstrukci stylu, ktere umozni telu stranky v pripade potreby slidovat spolu s mobilnim menu
+//  Pouziva se v definici stylu layoutu
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+@mixin layout-slide($menu-size-map) {
+
+  // pruchod media queries pomoci mapy zadane v settings
+  @each $screen-dimension, $width-value in $menu-size-map {
+
+	// pokud je aktualni hodnota 0px, zapise se vlastnost bez media queries
+	@if (nth($screen-dimension, 1) == 0px) {
+
+	  right: $width-value;
+	  @include transition(right 200ms ease-in);
+
+	  // pokud ne, vypise se vlastnost v media query
+	} @else {
+
+	  @include mq(nth($screen-dimension, 1)) {
+
+		right: $width-value;
+		@include transition(right 200ms ease-in);
+
+	  }
+	}
+  }
+}

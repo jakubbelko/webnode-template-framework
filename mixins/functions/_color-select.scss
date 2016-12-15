@@ -1,0 +1,68 @@
+// mixin pro generování selectoru obarvovacího systému
+
+@mixin color-select($sc: false, $ac: false, $addSections: false) {
+
+  // Additivní barva + barva sekce
+  @if $ac != false {
+	// Podmínka na additivní barvu
+	@if $ac == $additive-color {
+	  // Podmínka na sekční barvu
+	  @if $sc != false {
+		@each $color in $sc {
+		  @if $color == $section-color {
+			.#{$additive-color} .#{$section-color} {
+			  @content;
+			}
+		  }
+		}
+	  } @else { // pokud není specifikovaná sekční barva, aplikovat jen na aditivní - nutný zápis volání argumentu s proměnnou ($ac : color-pink)
+		body .#{$additive-color} {
+		  @content;
+		}
+	  }
+	}
+  } @else if $sc != false {
+	// Sekční barva
+	@each $color in $sc {
+	  @if $layout-color != false AND $section-color == false {
+		// Projít všech barev zda se některá nerovná
+		@if $color == $layout-color {
+
+		  @if $addSections == true {
+			// Přidá navíc totéž, ale jen pro sekce. U šablon, kde je section-color i na layoutu (06-portfolio)
+			// je třeba zajistit, aby pravidlo pro sekci bylo silnější než pravidlo pro layout.
+			// Pravidlo pro layout je však nutné ponechat, protože je pak použito pro section-none.
+			.#{$layout-color},
+			.section.#{$layout-color} {
+			  @content;
+			}
+		  } @else {
+			.#{$layout-color} {
+			  @content;
+			}
+		  }
+
+		}
+	  } @else {
+		// Projít všech barev zda se některá nerovná
+		@if $color == $section-color {
+
+		  @if $addSections == true {
+			// Přidá navíc totéž, ale jen pro sekce. U šablon, kde je section-color i na layoutu (06-portfolio)
+			// je třeba zajistit, aby pravidlo pro sekci bylo silnější než pravidlo pro layout.
+			// Pravidlo pro layout je však nutné ponechat, protože je pak použito pro section-none.
+			.#{$section-color},
+			.section.#{$section-color} {
+			  @content;
+			}
+		  } @else {
+			.#{$section-color} {
+			  @content;
+			}
+		  }
+
+		}
+	  }
+	}
+  }
+}

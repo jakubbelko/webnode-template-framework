@@ -1,0 +1,30 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin word-break
+//
+// zalomeni dlouhych slov a hypheny
+//
+//      layout │ hyphens
+//  _______________
+// │Firefox│_✓_│_✓_│
+// │Chrome │_✓_│_x_│
+// │IE 11  │_✓_│_?_│
+// │EDGE   │_x_│_?_│
+// │Opera  │_✓_│_x_│
+// │Safari │_✓_│_✓_│
+//
+// V EDGE je layout v pořádku do délky slova na 4 řádky. Delší rozbíjí layout dané sekce. MS vkládá hyphens jen někde.
+//
+// @author:		ara
+// @date:		17.03.3026
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin word-break {
+  overflow-wrap: break-word;
+  word-wrap: break-word; //nektere prohlizece vyzaduji pro funkcnost misto overflow-wrap
+  word-break: break-word; //neoficialni reseni pro webkit, chova se jako word-wrap:break-word ale pro dynamickou sirku
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}

@@ -1,0 +1,26 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin element-padding
+//
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin element-padding($source, $multiple: 1) {
+  $padding: '';
+
+  @each $data in $source {
+	@if (nth($data, 1) == 0) {
+	  padding-bottom: ceil(nth($data, 2) * $multiple);
+	  $padding: ceil(nth($data, 2) * $multiple);
+	} @else {
+	  @include mq(nth($data, 1)) {
+		@if ($padding != ceil(nth($data, 2) * $multiple)) {
+		  padding-bottom: ceil(nth($data, 2) * $multiple);
+		  $padding: ceil(nth($data, 2) * $multiple);
+		}
+	  }
+	}
+  }
+}

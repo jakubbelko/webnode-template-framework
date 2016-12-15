@@ -1,0 +1,56 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin text-color
+//
+// barva textu s automatickym fallbackem pro RGBa
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin text-color($color-set, $map: false, $set-alpha: false, $important: false) {
+  $color: false;
+  $ready: false;
+  $imp: '';
+
+  @if $important {
+    $imp: ' !important';
+  }
+
+  // nacitani z mapy barev
+  @if $map {
+    $color: get-map-value($map, $color-set);
+    $ready: true;
+  }
+
+  // barva je zadana primo
+  @else {
+    $color: $color-set;
+    $ready: true;
+  }
+
+
+  @if $color {
+    @if $set-alpha {
+      $color: change_color($color, $alpha: $set-alpha);
+    }
+
+    $alpha: alpha($color);
+
+    @if $alpha < 1 {
+	  @if $wtf-ie8-support {
+		$color-rgb: change_color($color, $alpha: 1);
+		color: $color-rgb#{$imp};
+	  }
+      color: $color#{$imp};
+    }
+    @else {
+      color: $color#{$imp};
+    }
+  }
+}

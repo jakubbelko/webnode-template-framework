@@ -1,0 +1,29 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-face
+//
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+@mixin font-face($family, $folder, $file, $weight, $style, $woff2: true) {
+  @font-face {
+	font-family: '#{$family}';
+
+	@if $woff2 {
+	  src: url('../fonts/#{$folder}/#{$file}.woff2') format('woff2'),
+	  url('../fonts/#{$folder}/#{$file}.woff') format('woff'),
+	  url('../fonts/#{$folder}/#{$file}.ttf') format('truetype');
+	} @else {
+	  src: url('../fonts/#{$folder}/#{$file}.woff') format('woff'),
+	  url('../fonts/#{$folder}/#{$file}.ttf') format('truetype');
+	}
+
+	font-weight: $weight;
+	font-style: $style;
+	font-rendering: swap 500ms;
+	font-display: swap;
+  }
+}

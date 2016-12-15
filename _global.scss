@@ -1,0 +1,28 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// global.scss
+// globální styly šablon
+// soubor se importu po settings.scss šablony a je tak možné ovlivnit některé proměnné
+//
+// version:         1.0
+// date:            03.08.2016
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Global styles
+@import "global/class";
+@import "global/reset";
+@import "global/image-float";
+@import "global/mobile-align";
+@import "global/color-links";
+@import "global/wsw";
+@import "global/fonts-fallback";
+
+// Sections
+@import "sections/section-bg";
+@import "sections/fullscreen-header";
+@import "sections/fullscreen-header-all";
+
+// Tiskove styly
+@import "print/print";
+
+// Photo swipe
+@import "photoswipe/main";

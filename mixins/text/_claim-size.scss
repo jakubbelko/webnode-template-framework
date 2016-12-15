@@ -1,0 +1,281 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// New Claim Size Mixins 2.0
+//
+//
+// @author:		pan
+// @date:		11.01.2015
+// @version:	2.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+// mixin, ktery z dodane mapy vytvori pravidla pro defaultni 100% velikosti rodicovskeho elementu claimu
+
+
+@mixin claim-default-size($size-map){
+
+  @each $size-data in $size-map {
+
+    $breakpoint: nth($size-data, 1);
+    $font-size: nth($size-data, 2);
+
+    @if $breakpoint == 0 {
+      @include font-size($font-size);
+    }@else{
+      @include mq($breakpoint) {
+        @include font-size($font-size);
+      }
+    }
+  }
+}
+
+// mixin díky kterému je možné zadat větší/menší velikost pro vybraný font
+
+@mixin font-size-correction($correction-map){
+
+  @each $font-data in $correction-map {
+
+    $font-name: nth($font-data, 1);
+    $font-size: nth($font-data, 2);
+
+    &.#{$font-name} {
+      font-size: $font-size;
+    }
+  }
+}
+
+//
+
+@mixin make-line-heights-map($line-heights-map){
+
+  @each $font-data in $line-heights-map {
+
+    // media-query based 1level map
+    @if type-of(nth($font-data, 1)) == number {
+
+      $breakpoint: nth($font-data, 1);
+      $font-line-height: nth($font-data, 2);
+
+      @if (nth($font-data, 1) == 0) {
+        > span {
+          line-height: $font-line-height;
+        }
+      }@else{
+        @include mq($breakpoint) {
+          > span {
+            line-height: $font-line-height;
+          }
+        }
+      }
+
+    // font-name based 1level map
+    }@else {
+
+      $font-name: nth($font-data, 1);
+      $font-line-height: nth($font-data, 2);
+
+      &.#{$font-name} > span {
+        line-height: $font-line-height;
+      }
+
+    }
+  }
+}
+
+@mixin line-heights($line-heights-map){
+
+  @if type-of($line-heights-map) == number or type-of($line-heights-map) == string {
+
+    > span {
+      line-height: $line-heights-map;
+    }
+
+  }@else{
+      @if map-depth($line-heights-map) == 1 {
+
+          @include make-line-heights-map($line-heights-map);
+
+
+       }@else{
+
+      @each $data, $map in $line-heights-map {
+
+        @if (nth($data, 1) == 0) {
+
+          @include make-line-heights-map($map);
+
+        } @else {
+
+          @include mq(nth($data, 1)) {
+            @include make-line-heights-map($map);
+          }
+        }
+      }
+    }
+  }
+}
+
+// podpurny mixin, ktery pouze ze zadane jednourovnove mapy pouze vytvori soubor pravidel velikosti pro jednotlive stupne zmenseni claimu
+// vyuziva jej font-auto-size()
+
+@mixin make-autosize-map($size-map){
+
+  @each $size-data in $size-map {
+
+    $size-class: nth($size-data, 1);
+    $size-percentage: nth($size-data, 2);
+
+    .wnd-font-size-#{$size-class} > span {
+      font-size: $size-percentage;
+    }
+  }
+}
+
+// mixin vytvarejici soubor velikosti pro jednotlive stupne zmenseni claimu
+// pokud dostane jednourovnovou mapu, vytvori jen zakladni seznam pravidel velikosti pro fonty
+// pokud dostane viceurovnovou mapu, vytvori responzivni seznam pravidel
+
+@mixin font-auto-size($size-map){
+
+
+  @if map-depth($size-map) == 1 {
+
+    @include make-autosize-map($size-map);
+
+  }@else{
+
+    @each $data, $map in $size-map {
+
+      @if (nth($data, 1) == 0) {
+
+        @include make-autosize-map($map);
+
+      } @else {
+
+        @include mq(nth($data, 1)) {
+          @include make-autosize-map($map);
+        }
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// old versions of the new mixins - DELETE
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+// mixin, ktery vytvori soubor pravidel pro line-height k jednotlivym fontum ze zadane mapy
+
+//@mixin line-heights($line-heights-map){
+//
+//  @each $font-data in $line-heights-map {
+//
+//    $font-name: nth($font-data, 1);
+//    $font-line-height: nth($font-data, 2);
+//
+//    &.#{$font-name} {
+//      line-height: $font-line-height;
+//    }
+//  }
+//}
+//
+//@mixin line-heights-2($line-heights-map){
+//
+//  @each $font-data in $line-heights-map {
+//
+//    $font-name: nth($font-data, 1);
+//    $font-line-height: nth($font-data, 2);
+//
+//    &.#{$font-name} > span {
+//      line-height: $font-line-height;
+//    }
+//  }
+//}
+
+// mixin, ktery vytvori soubor pravidel velikosti pro jednotlive stupne zmenseni claimu
+
+//@mixin font-auto-size($size-map){
+//
+//  @each $size-data in $size-map {
+//
+//    $size-class: nth($size-data, 1);
+//    $size-percentage: nth($size-data, 2);
+//
+//    .wnd-font-size-#{$size-class} {
+//      font-size: $size-percentage;
+//    }
+//  }
+//}
+//
+//@mixin font-auto-size-2($size-map){
+//
+//  @each $size-data in $size-map {
+//
+//    $size-class: nth($size-data, 1);
+//    $size-percentage: nth($size-data, 2);
+//
+//    .wnd-font-size-#{$size-class} > span {
+//      font-size: $size-percentage;
+//    }
+//  }
+//}
+
+
+///////////////
+///////////////
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// claim-size mixins - old version - DEPRECATED
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+// mixin pro vytvoreni "mapy" velikosti claimovych fontu podle zadane sass mapy
+// kandidat na optimalizaci, spousta kodu se opakuje a neco uz je ted i mozna zbytecne
+
+@mixin font-size-map($data, $map){
+
+  @each $size in $map {
+
+    $class-no: nth($size, 1);
+    $font-sizes: nth($size, 2);
+
+    $class-no-pair: $class-no - 10;
+
+    @if length($font-sizes) != 2 {
+      @warn "claim-size has bad argument count";
+    }
+
+    @if $class-no == 100 {
+
+      @include font(nth($font-sizes,1), nth($font-sizes,2));
+
+      &.wnd-font-size-#{$class-no-pair} {
+        @include font(nth($font-sizes,1), nth($font-sizes,2));
+      }
+
+    }@else{
+
+      &.wnd-font-size-#{$class-no}, &.wnd-font-size-#{$class-no-pair} {
+        @include font(nth($font-sizes,1), nth($font-sizes,2));
+      }
+    }
+  }
+}
+
+@mixin claim-size($font-size-map) {
+
+  @each $data, $map in $font-size-map {
+
+    @if (nth($data, 1) == 0) {
+
+     @include font-size-map($data, $map);
+
+    } @else {
+
+      @include mq(nth($data, 1)) {
+        @include font-size-map($data, $map);
+      }
+    }
+  }
+}

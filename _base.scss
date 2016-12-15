@@ -1,0 +1,117 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// base.scss
+// zakladni nastaveni, mixiny a funkce pro WTF
+//
+// version:         1.2
+// date:            23.8.2015
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Záhlaví všech CSS souborů s odkazem na stránku s licencemi
+
+/*!
+ * Author: Webnode.com
+ * This website may use some licensed content – more details here: http://www.webnode.com/license/ */
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Base breakpoints ----------------------------------------------------------------------------------------------------
+
+$wtf-bp-phone:							320px !default;							// [px]
+$wtf-bp-iphone6:						365px !default;							// [px]
+$wtf-bp-mobile:							480px !default;							// [px]
+$wtf-bp-phablet:						600px !default;							// [px]
+$wtf-bp-tablet:							768px !default;							// [px]
+$wtf-bp-desktop:						900px !default;							// [px]
+$wtf-bp-hd-ready:						1200px !default;						// [px]
+$wtf-bp-desktop-hd:						1400px !default;						// [px]
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// po uprave gulpu odstranit, bude se generovat automaticky
+$layout-color: false !default;
+
+// Výchozí barva pozadí layoutu
+$wtf-layout-background-color: #ffffff !default;
+
+// ON/OFF automatickeho generovani fallbacku pro IE8
+$wtf-ie8-support: false !default;
+
+// výška CMS toolbaru
+$wtf-cms-toolbar-height: 45px !default;
+
+// výchozí velikost bloků, microTemplates
+$wtf-elements: normal !default;
+
+// zakladni barva pro claimy a loga pokud neni doplnkova barva
+$wtf-base-claim-color: #77a9ca !default;
+
+// barva pro výběr textu (selection)
+$wtf-base-selection-color: #69a0d7 !default;
+
+// promenna urcujici, zda se background color zapise jen do .section, nebo i do .section-bg
+$colors-bg-type: classic !default; // [ classic / section-bg ]
+
+// defaultní výška Cookie baru
+$wtf-cookie-bar-height:	46px !default;
+
+// defaultní výška User baru
+$wtf-user-bar-height: 47px !default;
+
+// Vynulování odsazení textu
+$wtf-text-indent-viewport: $wtf-bp-phablet !default;
+
+// Vynucené zarovnání text
+$wtf-text-align-viewport: $wtf-bp-phablet !default;
+
+// Zrušení sloupců
+$wtf-column-destroy: $wtf-bp-phablet !default;
+
+// Hodnota násobku offsetu textu
+$wtf-text-offset-multiple: 1.5 !default; // [ 0.1 - 10 * 1em ]
+
+// Bod kdy se má uplatnit progresivní offset
+$wtf-text-offset-point: 0 !default; // [ 0 - 5 ]
+
+// Hodnota násobku offsetu textu pro mikro šablony
+$wtf-mt-text-offset-multiple: 0.75 !default; // [ 0.1 - 10 * 1em ]
+
+// Bod kdy se má uplatnit progresivní offset v mikro šablonách
+$wtf-mt-text-offset-point: 0 !default; // [ 0 - 5 ]
+
+// Generování offsetu pro staré šablony
+$wtf-text-offset-old-typo: false !default; // [true, false]
+
+// Generování selectoru pro starou koncepci typografie
+$wtf-old-typo-selectors: false !default; // [true, false]
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// IE 10 in Windows 8 and Windows phone 8 view fix
+// http://getbootstrap.com/getting-started/#support-ie10-width
+
+@-webkit-viewport   { width: device-width; }
+@-moz-viewport      { width: device-width; }
+@-ms-viewport       { width: device-width; }
+@-o-viewport        { width: device-width; }
+@viewport           { width: device-width; }
+
+
+html {
+  // IE 10+ bug - scrollbar neni standartne soucasti obsahu stranky, a tak jej prekryva
+  // Odkaz na MSDN https://msdn.microsoft.com/library/hh771902(v=vs.85).aspx
+  -ms-overflow-style: scrollbar;
+
+  // Firefox bug - vykreslování fontů tučněji než je nastaveno
+  // http://stackoverflow.com/questions/4698564/fonts-looks-different-in-firefox-and-chrome
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Base imports --------------------------------------------------------------------------------------------------------
+
+@import "normalize/normalize-3.0.2";
+
+@import "wtf-grid/wtf-grid-1.0";
+
+@import "mixins/mixins";

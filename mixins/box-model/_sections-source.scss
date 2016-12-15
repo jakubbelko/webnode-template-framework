@@ -1,0 +1,64 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin sections-source
+//
+// projde responsivni mapu chovani section a vygeneruje prislusne CSS
+//
+// 1]	breakpoint [px]
+// 2]	sirka section-inneru [px]
+// 3]	padding top/bottom [px]
+// 4]	padding left/right [px]
+// 5]	section-inner position [center, left, right]
+//
+//
+// $top/$bottom - nasobic padding top/bottom
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin sections-source($source, $top: false, $bottom: false) {
+  $padding-top: '';
+  $padding-bottom: '';
+
+  @each $section in $source {
+	@if($top != false) {
+	  $padding-top: ceil(nth($section, 3) * $top);
+	}
+	@else {
+	  $padding-top: nth($section, 3);
+	}
+
+	@if($bottom != false) {
+	  $padding-bottom: ceil(nth($section, 3) * $bottom);
+	}
+	@else {
+	  $padding-bottom: nth($section, 3);
+	}
+
+	@if( nth($section, 1) == 0 ) {
+	  max-width: nth($section, 2);
+	  padding: $padding-top nth($section, 4) $padding-bottom;
+
+	  @if nth($section, 5) == center {
+		margin: 0 auto !important;
+	  }
+	  @else {
+		float: nth($section, 5);
+	  }
+	}
+	@else {
+	  @include mq(nth($section, 1)) {
+		max-width: nth($section, 2);
+		padding: $padding-top nth($section, 4) $padding-bottom;
+
+		@if nth($section, 5) == center {
+		  margin: 0 auto !important;
+		}
+		@else {
+		  float: nth($section, 5);
+		}
+	  }
+	}
+  }
+}

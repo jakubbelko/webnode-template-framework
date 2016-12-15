@@ -1,0 +1,41 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-source
+//
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin font-source($source) {
+  $font-weight: '';
+  $font-style: '';
+
+  @each $font in $source {
+	@if( nth($font, 1) == 0 ) {
+	  @include font-size(nth($font, 2));
+	  @include line-height(nth($font, 3), nth($font, 2));
+	  font-weight: nth($font, 4);
+	  $font-weight: nth($font, 4);
+
+	  font-style: nth($font, 5);
+	  $font-style: nth($font, 5);
+	}
+	@else {
+	  @include mq(nth($font, 1)) {
+		@include font-size(nth($font, 2));
+		@include line-height(nth($font, 3), nth($font, 2));
+
+		@if( $font-weight != nth($font, 4) ) {
+		  font-weight: nth($font, 4);
+		  $font-weight: nth($font, 4);
+		}
+
+		@if( $font-style != nth($font, 5) ) {
+		  font-style: nth($font, 5);
+		  $font-style: nth($font, 5);
+		}
+	  }
+	}
+  }
+}

@@ -1,0 +1,111 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin wtf-column-width
+//
+// z mapy $wtf-column-width vygeneruje responsivni margin-left a margin-right
+//
+// $left: false - nevygeneruje se margin-left
+// $right: false - nevygeneruje se margin-right
+//
+// @author:		jbe
+// @date:		02.02.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin column-margin($left: true, $right: true, $important: false) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @each $mq, $width in $wtf-column-width {
+	@include mq($mq) {
+	  $margin: (100% - $width) / 2;
+
+	  @if $left {
+		margin-left: $margin#{$imp};
+	  }
+
+	  @if $right {
+		margin-right: $margin#{$imp};
+	  }
+	}
+  }
+}
+
+
+@mixin column-padding($left: true, $right: true, $important: false) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @each $mq, $width in $wtf-column-width {
+	@include mq($mq) {
+	  $padding: (100% - $width) / 2;
+
+	  @if $left {
+		padding-left: $padding#{$imp};
+	  }
+
+	  @if $right {
+		padding-right: $padding#{$imp};
+	  }
+	}
+  }
+}
+
+@mixin column-width($attr: margin, $left: true, $right: true, $important: false, $column-width-map: $wtf-column-width, $multiple: 1) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  // podle nastaveni nastavit delitele
+  $factor: 2;
+  @if( $left == false or $right == false ) {
+	$factor: 1;
+  }
+
+  @each $mq, $width in $column-width-map {
+	@include mq($mq) {
+	  $space: ((100% - $width) / $factor) * $multiple;
+
+	  @if $left {
+		#{$attr}-left: $space#{$imp};
+	  }
+
+	  @if $right {
+		#{$attr}-right: $space#{$imp};
+	  }
+	}
+  }
+}
+
+// z mapy $wtf-column-width vygeneruje responsivni absolutní pozicování
+@mixin column-width-position($top: false, $bottom: false, $leftinitial: 0, $rightinitial: 0, $important: false) {
+
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  position: absolute;
+  left: $leftinitial#{$imp};
+  right: $rightinitial#{$imp};
+
+  @if $top {
+	top: $top#{$imp};
+  }
+  @if $bottom {
+	bottom: $bottom#{$imp};
+  }
+
+  @each $mq, $width in $wtf-column-width {
+	@include mq($mq) {
+	  $space: (100% - $width) / 2;
+	  left: $space#{$imp};
+	  right: $space#{$imp};
+	}
+  }
+}
+

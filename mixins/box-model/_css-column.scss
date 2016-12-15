@@ -1,0 +1,25 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin css-column
+//
+// $count - pocet sloupcu
+// $width - sirka sloupce [px, %]
+// $gap - sirka mezery mezi sloupci [px, %]
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @source: http://jecas.cz/column
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin css-column($count: 2, $width: 0, $gap: 0) {
+  @include prefixer(column-count, $count);
+
+  @if( $width != 0 ) {
+	@include prefixer(column-width, $width);
+  }
+
+  @if( $gap > 0 ) {
+	@include prefixer(column-gap, $gap);
+  }
+}

@@ -1,0 +1,140 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// section-bg.scss
+//
+// Společné chování section background
+//
+// version:         1.0
+// date:            03.09.2015
+// author:			jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+.section {
+  position: relative;
+  //overflow: hidden;
+}
+
+.section-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+}
+
+.section-bg-layer {
+  @include position(absolute, 0, 0, 0, 0);
+  overflow: hidden;
+
+  > div {
+	position: relative;
+	height: 100%;
+	text-align: center;
+  }
+}
+
+//@todo JBE - odstranit první řádek pro příští release
+.wnd-video-background,
+.wnd-background-video {
+  &.orientation-landscape {
+	width: 100%;
+	height: auto;
+  }
+
+  &.orientation-portrait {
+	width: auto;
+	height: 100%;
+  }
+}
+
+.section-bg-overlay {
+  display: none;
+}
+
+.wnd-background-image {
+  -webkit-background-size: cover;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.wnd-background-pattern {
+  background-repeat: repeat;
+  background-size: auto;
+}
+
+.wnd-background-image,
+.wnd-background-pattern,
+.wnd-background-video {
+  + .section-bg-overlay {
+	display: block;
+  }
+}
+
+
+// Background positions -------------------------
+
+.bgpos-top-center {
+  background-position: center top;
+}
+
+.bgpos-center-center {
+  background-position: center center;
+}
+
+.bgpos-bottom-center {
+  background-position: center bottom;
+}
+
+
+// Background Paralax ---------------------------
+
+body:not(.touched) .bgatt-fixed {
+  background-attachment: fixed;
+}
+
+.bgatt-scroll {
+  background-attachment: scroll;
+}
+
+body:not(.wnd-cms) {
+
+  .section {
+	z-index: 0;
+  }
+
+  .section-bg {
+	z-index: -1;
+  }
+
+  .parallax {
+	position: fixed;
+	z-index: -1;
+	@include transform(translate3d(0, 0, 0));
+	pointer-events: none;
+  }
+}
+
+// IMG instead of video tag for free account ----
+
+body:not(.wnd-cms) {
+
+  &:not(.isIE) {
+
+	.section-bg {
+	  img.wnd-video-background {
+		height: 100%;
+		object-fit: cover;
+	  }
+	}
+
+  }
+  &.isIE {
+
+	.section-bg {
+	  img.wnd-video-background {
+		height: 100%;
+		width: auto;
+	  }
+	}
+
+  }
+}

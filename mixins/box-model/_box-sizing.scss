@@ -1,0 +1,22 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin box-sizing
+//
+// $model - [content-box, border-box] vychozi hodnota border-box
+// $important - [true, false] pridani parametru important k pravidlu.
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin box-sizing($model: border-box, $important: false) {
+  $imp: '';
+
+  @if $important {
+	$imp: ' important!';
+  }
+
+  @if $model {
+	box-sizing: $model#{$imp};
+  }
+}

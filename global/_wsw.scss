@@ -1,0 +1,97 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// wsw.scss
+// styly pro WSW editor'
+//
+// version:         1.0
+// date:            18.08.2016
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Zarovnání textu -----------------------------------------------------------------------------------------------------
+.wnd-page {
+  .text {
+	.wnd-align-left {
+	  text-align: left;
+	}
+
+	.wnd-align-center {
+	  text-align: center;
+	}
+
+	.wnd-align-justify {
+	  text-align: justify;
+	}
+
+	.wnd-align-right {
+	  text-align: right;
+	}
+  }
+}
+
+
+// Odsazení textu ------------------------------------------------------------------------------------------------------
+
+@mixin wnd-offset($multiple, $point) {
+
+  @include mq($wtf-text-indent-viewport) {
+
+	@for $i from 1 through 5 {
+
+	  .wnd-offset-#{$i} {
+		$offset: $i * 1em;
+
+		@if $i > $point {
+		  $offset: $offset * $multiple;
+		}
+
+		margin-left: $offset;
+		margin-right: $offset;
+
+		@if ( $wtf-text-offset-old-typo == false ) {
+		  &[style*="text-align: center"],
+		  &[style*="text-align:center"],
+		  &[style*="text-align: justify"],
+		  &[style*="text-align:justify"],
+		  &.wnd-align-center,
+		  &.wnd-align-justify {
+		    margin-left: $offset * 0.5;
+		    margin-right: $offset * 0.5;
+		  }
+		}
+	  }
+
+	}
+
+  }
+}
+
+.text {
+  @include wnd-offset($wtf-text-offset-multiple, $wtf-text-offset-point);
+}
+
+.mt .text {
+  @include wnd-offset($wtf-mt-text-offset-multiple, $wtf-mt-text-offset-point);
+}
+
+
+// A+/A- pro text ------------------------------------------------------------------------------------------------------
+
+@mixin wnd-font-size() {
+  font {
+	@for $i from 1 through 20 {
+	  $size: $i * 10;
+
+	  &.wnd-font-size-#{$size} {
+		$size: $size * 1%;
+		font-size: $size;
+	  }
+	}
+  }
+}
+
+@include wnd-font-size;
+
+
+// Korekce line height pro pouziti A+/-
+font[class*='wnd-font-size'] {
+  display: inline-block;
+}

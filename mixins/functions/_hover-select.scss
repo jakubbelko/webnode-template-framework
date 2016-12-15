@@ -1,0 +1,33 @@
+// mixin pro generování selectoru pro hover
+
+
+@mixin hover($type:'') {
+
+  @if $type == 'cms' {
+
+	&:hover {
+	  body.wnd-cms:not(.touched) & {
+		@content;
+	  }
+	}
+
+  } @else if $type == 'menu' {
+
+	&:hover {
+	  body:not(.touched) & {
+		@content;
+	  }
+	}
+
+  }
+  @else {
+
+	&:hover {
+	  body:not(.touched):not(.wnd-cms) & {
+		@content;
+	  }
+	}
+
+  }
+
+}

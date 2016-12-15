@@ -1,0 +1,34 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin block-padding
+//
+// z mapy $wtf-column-width vygeneruje responsivni padding-left a padding-right
+//
+// $left: false - nevygeneruje se margin-left
+// $right: false - nevygeneruje se margin-right
+// $important: true - vygeneruje !important
+//
+// @author:		jbe
+// @date:		02.02.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin block-padding($source: $wtf-column-width, $left: true, $right: true, $important: false, $multiple: 1) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @each $column in $source {
+	@include mq(nth($column, 1)) {
+	  $padding: ((100% - nth($column, 2)) / 2) * $multiple;
+
+	  @if $left {
+		padding-left: $padding#{$imp};
+	  }
+
+	  @if $right {
+		padding-right: $padding#{$imp};
+	  }
+	}
+  }
+}

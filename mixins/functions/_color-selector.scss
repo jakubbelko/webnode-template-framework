@@ -1,0 +1,204 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin:		color-selector
+//
+// @author:		jbe
+// @date:		01.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin selectors($section, $additive, $layout: false, $section-class: false, $wnd-cms: false) {
+  @if $layout {		// layoutove obarvovani
+	@if $layout == true { // obarvovani sekci
+	  @if $wnd-cms {
+		body:not(.wnd-cms) {
+		  .#{$section} {
+			@if $section-class {
+			  &.#{$section-class} {
+				@content;
+			  }
+			} @else {
+			  @content;
+			}
+		  }
+		}
+	  }
+	  @else {
+		body .#{$section} {
+		  @if $section-class {
+			&.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	}
+	@else { // obarvovani celeho layoutu
+	  @if $wnd-cms {
+		body.#{$layout}:not(.wnd-cms) {
+		  // pouze pro frontend
+		  @if $section-class {
+			.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  } @else {
+		.#{$layout} {
+		  @if $section-class {
+			.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	}
+  } @else {			// sekcni obarvovani s doplnkovou barvou
+	@if $additive {
+	  .#{$additive} {
+		@if $wnd-cms {
+		  &:not(.wnd-cms) {
+			@if $section-class {
+			  .#{$section}.#{$section-class} {
+				@content;
+			  }
+			}
+			@else {
+			  .#{$section} {
+				@content;
+			  }
+			}
+		  }
+		} @else {
+		  @if $section-class {
+			.#{$section}.#{$section-class} {
+			  @content;
+			}
+		  }
+		  @else {
+			.#{$section} {
+			  @content;
+			}
+		  }
+		}
+	  }
+	} @else {
+	  @if $wnd-cms {
+		body:not(.wnd-cms) {
+		  @if $section-class {
+			.#{$section}.#{$section-class} {
+			  @content;
+			}
+		  }
+		  @else {
+			.#{$section} {
+			  @content;
+			}
+		  }
+		}
+	  } @else {
+		@if $section-class {
+		  .#{$section}.#{$section-class} {
+			@content;
+		  }
+		}
+		@else {
+		  .#{$section} {
+			@content;
+		  }
+		}
+	  }
+	}
+  }
+}
+
+
+@mixin color-selector($section, $additive, $wnd-cms: false) {
+  @if $additive {
+	.#{$additive} {
+	  @if $wnd-cms {
+		&:not(.wnd-cms) {
+		  .#{$section} {
+			@content;
+		  }
+		}
+	  } @else {
+		.#{$section} {
+		  @content;
+		}
+	  }
+	}
+  } @else {
+	@if $wnd-cms {
+	  body:not(.wnd-cms) {
+		.#{$section} {
+		  @content;
+		}
+	  }
+	} @else {
+	  .#{$section} {
+		@content;
+	  }
+	}
+  }
+}
+
+@mixin layout-selector($section, $additive, $layout: false, $section-class: false, $wnd-cms: false) {
+  @if $layout == true { // obarvovani sekci
+	@if $wnd-cms {
+	  body:not(.wnd-cms) {
+		.#{$section} {
+		  @if $section-class {
+			&.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	}
+	@else {
+	  body .#{$section} {
+		@if $section-class {
+		  &.#{$section-class} {
+			@content;
+		  }
+		} @else {
+		  @content;
+		}
+	  }
+	}
+  }
+  @else { // obarvovani celeho layoutu
+	//.#{$layout} {
+	  @if $wnd-cms {
+		body.#{$layout}:not(.wnd-cms) { // pouze pro frontend
+		  @if $section-class {
+			.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	  @else {
+		.#{$layout} {
+		  @if $section-class {
+			.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	//}
+  }
+}

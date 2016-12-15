@@ -1,0 +1,19 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @function color-alpha
+//
+// $color - barva v HEX
+// $set-alpha - nastaveni alpha kanalu [0 - 1]
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@function color-alpha($color, $set-alpha) {
+  @if $set-alpha {
+	@return change_color($color, $alpha: $set-alpha);
+  }
+  @else {
+	@return $color;
+  }
+}

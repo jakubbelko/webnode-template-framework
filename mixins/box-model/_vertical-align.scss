@@ -1,0 +1,20 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin vertical-align
+//
+// vertical align center
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin vertical-align($top: 50%, $important: false) {
+  $imp: '';
+  @if $important {
+    $imp: ' !important';
+  }
+
+  @include transform(translateY(-50%));
+  position: relative#{$imp};
+  top: $top#{$imp};
+}

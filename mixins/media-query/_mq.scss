@@ -1,0 +1,48 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin mq
+//
+// media query mixin
+//
+// $min-width
+// $max-width
+// $min-height
+// $max-height
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin mq($min-width: false, $max-width: false, $min-height: false, $max-height: false) {
+
+  $m-width: '';
+  $x-width: '';
+  $m-height: '';
+  $x-height: '';
+  $and: ' and (';
+  $end: ')';
+  $mw: 'min-width: ';
+  $xw: 'max-width: ';
+  $mh: 'min-height: ';
+  $xh: 'max-height: ';
+
+  @if $min-width {
+	$m-width: #{$and}#{$mw}$min-width#{$end};
+  }
+
+  @if $max-width {
+	$x-width: #{$and}#{$xw}$max-width#{$end};
+  }
+
+  @if $min-height {
+	$m-height: #{$and}#{$mh}$min-height#{$end};
+  }
+
+  @if $max-height {
+	$x-height: #{$and}#{$xh}$max-height#{$end};
+  }
+
+  @media all#{$m-width}#{$x-width}#{$m-height}#{$x-height} {
+	@content;
+  }
+}

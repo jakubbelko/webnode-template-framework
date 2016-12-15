@@ -1,0 +1,15 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin justify-content
+//
+// @author:		jbe
+// @date:		29.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin justify-content($value) {
+  //-webkit-box-pack: $value;
+  -webkit-justify-content: $value;
+  -ms-flex-pack: $value;
+  -ms-justify-content: $value;
+  justify-content: $value;
+}

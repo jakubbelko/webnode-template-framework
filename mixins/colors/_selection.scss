@@ -1,0 +1,17 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin selection
+//
+// @author:		jbe
+// @date:		12.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin selection($bg, $alpha) {
+  ::-moz-selection {
+    @include bg-color($color-set: $bg, $set-alpha: $alpha);
+  }
+
+  ::selection {
+    @include bg-color($color-set: $bg, $set-alpha: $alpha);
+  }
+}

@@ -1,0 +1,54 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin embed-color
+//
+// barva embedu
+//
+// $color-set	- identifikator v SASS mape
+// $map			- promenna obsahujici SASS mapu s barvami
+// @author:		jma
+// @date:		16.09.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin embed-color($color-set, $map:false) {
+
+  $alpha: 1;
+  $opaque: false;
+  $foreground-configured-icon-embed-color: false;
+
+  //$foreground-section-color: get-map-value($wtf-section-color, section-text);
+
+  // Default styling i.e. no need to be embed color defined in config.
+  // But default state must be styled to avoid transfering section color with alpha to svg javascript.
+  // Before using this solution CMS had js error due to passing aplha color to svg javascript.
+
+  //@if $foreground-section-color {
+	//  $alpha: alpha($foreground-section-color);
+	//  $opaque: opacify($foreground-section-color, 1);
+  //}
+
+  @if $map {
+	$foreground-configured-icon-embed-color: get-map-value($map, $color-set);
+
+	@if $foreground-configured-icon-embed-color == false {
+	  $foreground-configured-icon-embed-color: get-map-value($wtf-section-color, section-text);
+	}
+  }
+  @else {
+	$foreground-configured-icon-embed-color: $color-set;
+  }
+
+  // For some section color there exists special color configured for embed in common content so we overwrite default styling
+
+  @if $foreground-configured-icon-embed-color {
+	$alpha: alpha($foreground-configured-icon-embed-color);
+	$opaque: opacify($foreground-configured-icon-embed-color, 1);
+  }
+
+  @if $opaque {
+	color: $opaque;
+	// Write opacity even if alpha = 1 for overwriting possible default partial opacity
+	@include opacity($alpha);
+  }
+
+}

@@ -1,0 +1,19 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin object-fit
+//
+// @author:		pan
+// @date:		03.05.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin object-fit($type: cover, $position: center center) {
+
+  object-fit: $type;
+  object-position: $position;
+  //font-family: 'object-fit: #{$type}; object-position: #{$position};';
+
+  //background-size: $type;
+  //background-position: $position;
+  //background-repeat: no-repeat;
+
+}

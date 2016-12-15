@@ -1,0 +1,84 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// fullscreen-header.scss
+//
+// Responsivní chování pro fullscreen header
+//
+// version:         1.0
+// date:            12.09.2015
+// author:			jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+.section-wrapper .fullscreen {
+  height: 100vh;
+  min-height: 400px;
+  max-height: 500px;
+
+  @include mq($min-width: 321px, $min-height: 481px) {
+	height: 75vh;
+  }
+
+  @include mq($min-width: $wtf-bp-mobile, $min-height: 600px) {
+	height: 60vh;
+	max-height: 550px;
+  }
+
+  @include mq($min-width: $wtf-bp-phablet, $min-height: 600px) {
+	height: 50vh;
+	max-height: 600px;
+  }
+
+  @include mq($min-width: $wtf-bp-desktop, $min-height: 769px) {
+	height: 70vh;
+	max-height: 600px;
+  }
+
+  @include mq($min-width: $wtf-bp-desktop, $max-height: 768px) {
+	height: 100vh;
+	max-height: 100%;
+  }
+
+  @include mq($wtf-bp-desktop-hd) {
+	height: 85vh;
+	max-height: 800px;
+  }
+
+  @include mq(1600px) {
+	height: 80vh;
+	max-height: 845px;
+  }
+
+  @include mq(1800px) {
+	height: 77vh;
+	max-height: 870px;
+  }
+}
+
+// CMS uprava roztazeni na fullscreen
+.wnd-cms .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet) {
+	height: calc(100vh - #{$wtf-cms-toolbar-height});
+	max-height: calc(100vh - #{$wtf-cms-toolbar-height});
+  }
+}
+
+
+// Korekce výšky sekce při zobrazení Cookie baru
+#wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet)  {
+	height: calc(100vh - #{$wtf-user-bar-height});
+  }
+}
+
+// Korekce výšky sekce při zobrazení User baru
+#wnd_user_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet)  {
+	height: calc(100vh - #{$wtf-user-bar-height});
+  }
+}
+
+// Korekce výšky sekce při zobrazení Cookie baru a User baru
+#wnd_user_bar:not([style="display: none;"]) + #wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet)  {
+	height: calc(100vh - #{$wtf-cookie-bar-height} - #{$wtf-user-bar-height});
+  }
+}

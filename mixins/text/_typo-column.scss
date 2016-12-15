@@ -1,0 +1,340 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin typo-column
+//
+// @author:		jbe
+// @date:		02.08.2016
+// @version:	1.0
+//
+//
+// Generování zuzeni textu na základe zarovnání
+// Pro určení šířky se používá mapa $wtf-column-width
+// $align: jak ma byt text zarovnan
+//
+// 	- left: text je zarovnán doleva a zužován je z levé strany
+//
+//	- right: text je zarovnán doprava a zužován je z pravé strany
+//
+//	- center: text je zarovnán na střed a zužován z obou stran
+//
+//	- justefy: text je roztažen na celou šířku a zužován z obou stran
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin typo-column($align: left, $selectors: true, $blog-style: false, $list-style: false) {
+  @if $align {
+	// Generovani bez selectoru pro inline styly
+	@if ($wtf-old-typo-selectors == true) {
+	  &:not([style*="text-align"]):not(.wnd-align-right):not(.wnd-align-left):not(.wnd-align-center):not(.wnd-align-justify) {
+
+		@if ($align == left) {
+		  margin-right: 0 !important;
+		}
+
+		@if ($align == right) {
+		  margin-left: 0 !important;
+		}
+
+		@if ($align == center OR $align == justify) {
+		  margin-left: inherit !important;
+		  margin-right: inherit !important;
+		}
+
+	  }
+	} @else {
+	  &:not(.wnd-align-right):not(.wnd-align-left):not(.wnd-align-center):not(.wnd-align-justify) {
+
+		@if ($align == left) {
+		  margin-right: 0 !important;
+		}
+
+		@if ($align == right) {
+		  margin-left: 0 !important;
+		}
+
+		@if ($align == center OR $align == justify) {
+		  margin-left: inherit !important;
+		  margin-right: inherit !important;
+		}
+
+	  }
+	}
+
+	$only-one-flag: true;
+
+	@each $mq, $width in $wtf-column-width {
+
+	  @if $only-one-flag == true {
+		// Vynulovani odsazeni pro zobrazeni ve sloupci nebo mikro sablone
+		@if ($align == left) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-right: 0;
+		  }
+		}
+
+		@if ($align == right) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-left: 0;
+		  }
+		}
+
+		@if ($align == center) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-left: 0;
+			padding-right: 0;
+		  }
+		}
+
+		@if ($align == justify) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-left: 0;
+			padding-right: 0;
+		  }
+		}
+
+		$only-one-flag: false;
+	  }
+
+	  @include mq($mq) {
+		$space: 0;
+		@if $blog-style == false {
+		  $space: 100% - $width;
+		}
+
+		@if ($align == left) {
+		  padding-right: $space;
+		  @if $list-style == false {
+			padding-left: 0;
+		  }
+		}
+
+		@if ($align == right) {
+		  padding-left: $space;
+		  @if $list-style == false {
+			padding-right: 0;
+		  }
+		}
+
+		@if ($align == center) {
+		  padding-left: $space / 2;
+		  padding-right: $space / 2;
+		}
+
+		@if ($align == justify) {
+		  @if $list-style == false {
+			padding-left: $space / 2;
+			padding-right: $space / 2;
+		  }
+		  @else {
+			padding-right: $space;
+		  }
+		}
+
+	  }
+	}
+
+  }
+
+  @if $selectors {
+	// Generovani vcetne selectoru pro inline styly
+
+	  @if ($wtf-old-typo-selectors == true) {
+		&[style*="text-align: left"],
+		&[style*="text-align:left"],
+		&.wnd-align-left {
+		  margin-right: 0 !important;
+		}
+	  } @else {
+		&.wnd-align-left {
+		  margin-right: 0 !important;
+		}
+	  }
+
+	  @if ($wtf-old-typo-selectors == true) {
+		&[style*="text-align: right"],
+		&[style*="text-align:right"],
+		&.wnd-align-right {
+		  margin-left: 0 !important;
+		}
+	  } @else {
+		&.wnd-align-right {
+		  margin-left: 0 !important;
+		}
+	  }
+
+	$only-one-flag: true;
+
+	@each $mq, $width in $wtf-column-width {
+
+	  @if $only-one-flag == true {
+		// Vynulovani odsazeni pro zobrazeni ve sloupci nebo mikro sablone
+
+		// text-align: left
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: left"],
+			&[style*="text-align:left"],
+			&.wnd-align-left {
+			  .column-wrapper &,
+			  .mt & {
+				padding-right: 0;
+				padding-left: 0;
+			  }
+			}
+		  } @else {
+			&.wnd-align-left {
+			  .column-wrapper &,
+			  .mt & {
+				padding-right: 0;
+				padding-left: 0;
+			  }
+			}
+		  }
+
+		// text-align: right
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: right"],
+			&[style*="text-align:right"],
+			&.wnd-align-right {
+			  .column-wrapper &,
+			  .mt & {
+				padding-right: 0;
+				padding-left: 0;
+			  }
+			}
+		  } @else {
+			&.wnd-align-right {
+			  .column-wrapper &,
+			  .mt & {
+				padding-right: 0;
+				padding-left: 0;
+			  }
+			}
+		  }
+
+		// text-align: center
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: center"],
+			&[style*="text-align:center"],
+			&.wnd-align-center {
+			  .column-wrapper &,
+			  .mt & {
+				padding-right: 0;
+				padding-left: 0;
+			  }
+			}
+		  } @else {
+			&.wnd-align-center {
+			  .column-wrapper &,
+			  .mt & {
+				padding-right: 0;
+				padding-left: 0;
+			  }
+			}
+		  }
+
+		// text-align: justify
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: justify"],
+			&[style*="text-align:justify"],
+			&.wnd-align-justify {
+			  .column-wrapper &,
+			  .mt & {
+				padding-left: 0;
+				padding-right: 0;
+			  }
+			}
+		  } @else {
+			&.wnd-align-justify {
+			  .column-wrapper &,
+			  .mt & {
+				padding-left: 0;
+				padding-right: 0;
+			  }
+			}
+		  }
+
+		$only-one-flag: false;
+	  }
+
+	  @include mq($mq) {
+		$space: 0;
+		@if $blog-style == false {
+		  $space: 100% - $width;
+		}
+
+		// text-align: left
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: left"],
+			&[style*="text-align:left"],
+			&.wnd-align-left {
+			  padding-right: $space;
+			  padding-left: 0;
+			}
+		  } @else {
+			&.wnd-align-left {
+			  padding-right: $space;
+			  padding-left: 0;
+			}
+		  }
+
+		// text-align: right
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: right"],
+			&[style*="text-align:right"],
+			&.wnd-align-right {
+			  padding-left: $space;
+			  padding-right: 0;
+			}
+		  } @else {
+			&.wnd-align-right {
+			  padding-left: $space;
+			  padding-right: 0;
+			}
+		  }
+
+		// text-align: center
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: center"],
+			&[style*="text-align:center"],
+			&.wnd-align-center {
+			  padding-left: $space / 2;
+			  padding-right: $space / 2;
+			}
+		  } @else {
+			&.wnd-align-center {
+			  padding-left: $space / 2;
+			  padding-right: $space / 2;
+			}
+		  }
+
+		// text-align: justify
+		  @if ($wtf-old-typo-selectors == true) {
+			&[style*="text-align: justify"],
+			&[style*="text-align:justify"],
+			&.wnd-align-justify {
+			  @if $list-style == false {
+				padding-left: $space / 2;
+				padding-right: $space / 2;
+			  }
+			  @else {
+				padding-right: $space;
+			  }
+			}
+		  } @else {
+			&.wnd-align-justify {
+			  @if $list-style == false {
+				padding-left: $space / 2;
+				padding-right: $space / 2;
+			  }
+			  @else {
+				padding-right: $space;
+			  }
+			}
+		  }
+
+	  }
+	}
+  }
+}

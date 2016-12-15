@@ -1,0 +1,54 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin text-shadow
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $position
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin text-shadow($color-set, $position: false, $map: false, $set-alpha: false, $important: false) {
+  $color: false;
+  $ready: false;
+  $imp: '';
+
+  @if $important {
+    $imp: ' !important';
+  }
+
+  @if $color-set == none {
+	text-shadow: none#{$imp};
+  } @else {
+	@if $map {
+	  $color: get-map-value($map, $color-set);
+	} @else {
+	  $color: $color-set;
+	}
+
+	@if $color == none {
+	  text-shadow: none#{$imp};
+	}
+	@elseif $color {
+	  @if $set-alpha {
+		$color: change_color($color, $set-alpha);
+	  }
+
+	  $alpha: alpha($color);
+
+	  @if $alpha < 1 {
+		@if $wtf-ie8-support {
+		  $color-rgb: change_color($color, $alpha: 1);
+		  text-shadow: $position $color-rgb#{$imp};
+		}
+		text-shadow: $position $color#{$imp};
+	  } @else {
+		text-shadow: $position $color#{$imp};
+	  }
+	}
+  }
+}

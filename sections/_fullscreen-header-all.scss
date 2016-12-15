@@ -1,0 +1,64 @@
+// Absolute fullscreen header ------------------------------------------------------------------------------------------
+
+.section-wrapper .fullscreen-all {
+  height: 100vh;
+  min-height: 360px;
+  max-height: 100%;
+
+  @media all and (max-width: 899px) and (orientation: portrait) {
+    height: 62vh;
+  }
+
+  @media all and (max-width: 899px) and (orientation: landscape) {
+    height: 82vh;
+  }
+
+  @media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (orientation: landscape)
+  and (-webkit-min-device-pixel-ratio: 2) {
+	height: 280px;
+  }
+  @media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (orientation: portrait)
+  and (-webkit-min-device-pixel-ratio: 2) {
+	height: 400px;
+  }
+}
+
+.ios-iframe .section-wrapper .fullscreen-all {
+  max-height: 500px;
+
+  @include mq($min-width: $wtf-bp-mobile, $min-height: 600px) {
+	max-height: 600px;
+  }
+
+  @include mq($min-width: $wtf-bp-tablet, $min-height: $wtf-bp-tablet) {
+	max-height: 800px;
+  }
+}
+
+// CMS uprava roztazeni na fullscreen
+.wnd-cms .section-wrapper .fullscreen-all {
+  height: calc(100vh - #{$wtf-cms-toolbar-height});
+  max-height: calc(100vh - #{$wtf-cms-toolbar-height});
+}
+
+
+// Korekce výšky sekce při zobrazení Cookie baru
+#wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen-all:first-child {
+  height: calc(100vh - #{$wtf-cookie-bar-height});
+}
+
+// Korekce výšky sekce při zobrazení User baru
+#wnd_user_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen-all:first-child {
+  height: calc(100vh - #{$wtf-user-bar-height});
+}
+
+// Korekce výšky sekce při zobrazení Cookie baru a User baru
+#wnd_user_bar:not([style="display: none;"]) + #wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen-all:first-child {
+  height: calc(100vh - #{$wtf-cookie-bar-height} - #{$wtf-user-bar-height});
+}

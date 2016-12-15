@@ -1,0 +1,37 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin prefix
+//
+// $property - CSS vlastnost
+// $prefixes - seznam pozadovanych prefixu
+// $value - hodnota/y
+//
+// @author:		mke + jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @example: @include prefix(border-radius, webkit moz, 4px);
+// @source: https://github.com/thoughtbot/bourbon
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin prefix($property, $prefixes, $value...) {
+  @each $pre in $prefixes {
+	@if $pre == webkit {
+	  -webkit-#{$property}: $value;
+	}
+	@else if $pre == moz {
+	  -moz-#{$property}: $value;
+	}
+	@else if $pre == ms {
+	  -ms-#{$property}: $value;
+	}
+	@else if $pre == o {
+	  -o-#{$property}: $value;
+	}
+	@else if $pre == spec {
+	  #{$property}: $value;
+	}
+	@else  {
+	  @warn "Neznamy prefix: #{$pre}";
+	}
+  }
+}

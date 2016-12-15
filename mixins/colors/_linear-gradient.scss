@@ -1,0 +1,45 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin linear-gradient
+//
+// $color-from:		HEX, id promene v SASS mape
+// $color-to:		HEX, id promene v SASS mape
+// $map:			false, nazev SASS mapy
+// $type:			false, left-right, right-left
+//
+// @author:		jbe
+// @date:		12.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin linear-gradient($color-from, $color-to, $map: false, $type: false) {
+  @if $map {
+    $color-from: get-map-value($map, $color-from);
+    $color-to: get-map-value($map, $color-to);
+  }
+
+  @if $color-from and $color-to {
+	$ie-from: ie-hex-str($color-from);
+    $ie-to: ie-hex-str($color-to);
+
+    $webkit: 'left top, left bottom';
+    $spec: '';
+    $ie: 0;
+
+    @if $type == left-right {
+      $webkit: 'left top, right bottom';
+      $spec: '135deg,';
+      $ie: 1;
+    }
+
+    @if $type == right-left {
+      $webkit: 'left bottom, right top';
+      $spec: '45deg,';
+      $ie: 1;
+    }
+
+    background-image: -webkit-gradient(linear, #{$webkit}, from($color-from), to($color-to));
+    background-image: -webkit-linear-gradient(#{$spec} $color-from, $color-to);
+    background-image: linear-gradient(#{$spec} $color-from, $color-to);
+    -ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$ie-from}', endColorstr='#{$ie-to}', GradientType=#{$ie});
+  }
+}
