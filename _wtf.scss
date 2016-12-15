@@ -1,9 +1,3 @@
-$wtf-blocks-space: (
-		0       10px,
-		768px   15px,
-		900px   20px
-) !default;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // base.scss
 // zakladni nastaveni, mixiny a funkce pro WTF
@@ -4694,3 +4688,18 @@ body:not(.wnd-cms) {
 #wnd_user_bar:not([style="display: none;"]) + #wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen-all:first-child {
   height: calc(100vh - #{$wtf-cookie-bar-height} - #{$wtf-user-bar-height});
 }
+
+
+
+
+
+
+
+
+// -----------------------------------------------------------------------
+
+$wtf-blocks-space: (
+		0       10px,
+		768px   15px,
+		900px   20px
+) !default;
