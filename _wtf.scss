@@ -1,0 +1,4690 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// base.scss
+// zakladni nastaveni, mixiny a funkce pro WTF
+//
+// version:         1.2
+// date:            23.8.2015
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Záhlaví všech CSS souborů s odkazem na stránku s licencemi
+
+/*!
+ * Author: Webnode.com
+ * This website may use some licensed content – more details here: http://www.webnode.com/license/ */
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Base breakpoints ----------------------------------------------------------------------------------------------------
+
+$wtf-bp-phone:							320px !default;							// [px]
+$wtf-bp-iphone6:						365px !default;							// [px]
+$wtf-bp-mobile:							480px !default;							// [px]
+$wtf-bp-phablet:						600px !default;							// [px]
+$wtf-bp-tablet:							768px !default;							// [px]
+$wtf-bp-desktop:						900px !default;							// [px]
+$wtf-bp-hd-ready:						1200px !default;						// [px]
+$wtf-bp-desktop-hd:						1400px !default;						// [px]
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// po uprave gulpu odstranit, bude se generovat automaticky
+$layout-color: false !default;
+
+// Výchozí barva pozadí layoutu
+$wtf-layout-background-color: #ffffff !default;
+
+// ON/OFF automatickeho generovani fallbacku pro IE8
+$wtf-ie8-support: false !default;
+
+// výška CMS toolbaru
+$wtf-cms-toolbar-height: 45px !default;
+
+// výchozí velikost bloků, microTemplates
+$wtf-elements: normal !default;
+
+// zakladni barva pro claimy a loga pokud neni doplnkova barva
+$wtf-base-claim-color: #77a9ca !default;
+
+// barva pro výběr textu (selection)
+$wtf-base-selection-color: #69a0d7 !default;
+
+// promenna urcujici, zda se background color zapise jen do .section, nebo i do .section-bg
+$colors-bg-type: classic !default; // [ classic / section-bg ]
+
+// defaultní výška Cookie baru
+$wtf-cookie-bar-height:	46px !default;
+
+// defaultní výška User baru
+$wtf-user-bar-height: 47px !default;
+
+// Vynulování odsazení textu
+$wtf-text-indent-viewport: $wtf-bp-phablet !default;
+
+// Vynucené zarovnání text
+$wtf-text-align-viewport: $wtf-bp-phablet !default;
+
+// Zrušení sloupců
+$wtf-column-destroy: $wtf-bp-phablet !default;
+
+// Hodnota násobku offsetu textu
+$wtf-text-offset-multiple: 1.5 !default; // [ 0.1 - 10 * 1em ]
+
+// Bod kdy se má uplatnit progresivní offset
+$wtf-text-offset-point: 0 !default; // [ 0 - 5 ]
+
+// Hodnota násobku offsetu textu pro mikro šablony
+$wtf-mt-text-offset-multiple: 0.75 !default; // [ 0.1 - 10 * 1em ]
+
+// Bod kdy se má uplatnit progresivní offset v mikro šablonách
+$wtf-mt-text-offset-point: 0 !default; // [ 0 - 5 ]
+
+// Generování offsetu pro staré šablony
+$wtf-text-offset-old-typo: false !default; // [true, false]
+
+// Generování selectoru pro starou koncepci typografie
+$wtf-old-typo-selectors: false !default; // [true, false]
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// IE 10 in Windows 8 and Windows phone 8 view fix
+// http://getbootstrap.com/getting-started/#support-ie10-width
+
+@-webkit-viewport   { width: device-width; }
+@-moz-viewport      { width: device-width; }
+@-ms-viewport       { width: device-width; }
+@-o-viewport        { width: device-width; }
+@viewport           { width: device-width; }
+
+
+html {
+  // IE 10+ bug - scrollbar neni standartne soucasti obsahu stranky, a tak jej prekryva
+  // Odkaz na MSDN https://msdn.microsoft.com/library/hh771902(v=vs.85).aspx
+  -ms-overflow-style: scrollbar;
+
+  // Firefox bug - vykreslování fontů tučněji než je nastaveno
+  // http://stackoverflow.com/questions/4698564/fonts-looks-different-in-firefox-and-chrome
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
+// WTF Grid 1.0
+//
+// Postaveno na SCSS (Sass), umožňuje rychle vytvořit responsivní/adaptivní grid jak pro fixní nebo fluidní layout,
+// relativní i pevné mezery. WTF Grid vychází z Profound gridu, který začal zlobit v Sass 3.4.
+//
+// Zůstalo zachováno použití záporných marginů pro umístění sloupců, aby se zabránilo subpixel zaokrouholování,
+// které obvykle rozkládají layout v některých prohlížečích.
+//
+// Je podporováno zanořování sloupců bez nutnosti obnovit mřížku na každé úrovni.
+//
+// Inspirace:		http://www.profoundgrid.com
+//
+// Licence:			WTFPL (http://www.wtfpl.net/)
+//
+// @author:			jbe
+// @date:			11.09.2014
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Grid settings -------------------------------------------------------------------------------------------------------
+
+$wtf-grid-columns:						12 !default;						// min. 2 - n (even)
+$wtf-grid-width:						100% !default;						// %, px
+$wtf-grid-gutter:						2% !default;						// %, px
+$wtf-grid-margin:						1% !default;						// %, px, auto
+
+// Grid math -----------------------------------------------------------------------------------------------------------
+
+@function element-width($column-index) {
+  @if( $wtf-grid-width == 100% ) {
+	$value: ( ( (100% + $wtf-grid-gutter) / $wtf-grid-columns ) * $column-index ) - $wtf-grid-gutter;
+	$value: $value * 100;
+	$rounded-value: round($value) / 100;
+	@return $rounded-value;
+  }
+  @else {
+	$value: ( ( ($wtf-grid-width + $wtf-grid-gutter) / $wtf-grid-columns ) * $column-index ) - $wtf-grid-gutter;
+	@return $value;
+  }
+}
+
+@function column-width() {
+  @if( $wtf-grid-width == 100% ) {
+	$value: ( ( ( 100% + $wtf-grid-gutter ) / $wtf-grid-columns ) ) - $wtf-grid-gutter;
+	$value: $value * 100;
+	$rounded-value: ( round($value) / 100 ) * 1%;
+	@return $rounded-value;
+  }
+  @else {
+	$value: ($wtf-grid-width - ( $wtf-grid-gutter * ( $wtf-grid-columns - 1 ) ) ) / $wtf-grid-columns;
+	@return $value;
+  }
+}
+
+@function container-width() {
+  @if( $wtf-grid-width == 100% ) {
+	@if( $wtf-grid-margin == 'auto' ) {
+	  @return 100%;
+	}
+	@return (100% - (2 * $wtf-grid-margin));
+  }
+  @else {
+	@return $wtf-grid-width;
+  }
+}
+
+// Grid mixins ---------------------------------------------------------------------------------------------------------
+
+@mixin grid-clearfix {
+  &:before,
+  &:after {
+	content: "";
+	display: table;
+  }
+  &:after {
+	clear: both;
+  }
+}
+
+
+@mixin container() {
+  width: container-width();
+  margin: 0 $wtf-grid-margin;
+}
+
+
+@mixin column($columns-width, $padding-columns: false) {
+  float: left;
+  margin-right: -100%;
+  $width: element-width($columns-width);
+  width: $width;
+
+  @if( $padding-columns ) {
+	@include push($padding-columns);
+  }
+}
+
+
+@mixin push($column-index) {
+  $width: 0%;
+  @if( $wtf-grid-width == 100% ) {
+	$width: ($wtf-grid-gutter + element-width($column-index));
+  }
+  @else {
+	$width: ($wtf-grid-gutter + element-width($column-index));
+  }
+  margin-left: $width;
+}
+
+
+@mixin grid-positions($column-selector, $element-width) {
+
+  $cols-per-row: floor($wtf-grid-columns / $element-width);
+
+  // create rule for each element
+  @for $i from 1 through $cols-per-row {
+
+	#{$column-selector}:nth-child(#{$cols-per-row}n+#{$i}){
+	  @include push(( ($i - 1) * $element-width ));
+	  margin-top: ($wtf-grid-margin / 2);
+	  margin-bottom: ($wtf-grid-margin / 2 );
+
+	  @if ($i == 1) {
+		clear: both;
+		@if( mixin-exists(clearfix) ) {
+		  @include clearfix;
+		}
+		@else {
+		  @include grid-clearfix;
+		}
+	  }
+	  @else {
+		clear: none;
+	  }
+	}
+  }
+}
+
+
+// @mixin blocks-grid --------------------------------------------------------------------------------------------------
+
+// $block - class trida pro bloky uvnitr containeru
+// $grid-settings - sass mapa s hodnotami breakpointů a počtem bloků v jednom řádku
+
+// ukázka použití
+
+//		$wtf-gallery: (
+//			480px	2,
+//			600px	3,
+//			768px	4,
+//			900px	6
+//		);
+
+
+//		.gallery {
+//			...
+//
+//			.photo {
+//				...
+//			}
+//
+//			@include blocks-grid('.photo', $wtf-gallery);
+//		}
+
+
+@mixin blocks-grid($block, $grid-settings) {
+
+  @include grid-positions($block, $wtf-grid-columns);
+
+  #{$block} {
+	@include column($wtf-grid-columns);
+  }
+
+  @each $grid in $grid-settings {
+	$column: $wtf-grid-columns / nth($grid, 2);
+
+	@include mq(nth($grid, 1)) {
+	  @include grid-positions($block, $column);
+
+	  #{$block} {
+		@include column($column);
+	  }
+	}
+  }
+}
+
+
+@mixin grid-column-width($columns-width) {
+  $width: element-width($columns-width);
+  width: $width;
+}
+
+@mixin blocks-width($width-settings) {
+
+  @include grid-column-width($wtf-grid-columns);
+
+  @each $width in $width-settings {
+	$column: $wtf-grid-columns / nth($width, 2);
+
+	@include mq(nth($width, 1)) {
+	  @include grid-column-width($column);
+	}
+  }
+}
+
+//////////// MIXINS FOR CENTERED MICROTEMPLATE CELLS
+
+@mixin centered-element-margins($column-count){
+
+
+  @for $i from 1 through $column-count {
+
+	&:nth-child(#{$column-count}n + #{$i}){
+
+	  @if $i == $column-count {
+		margin-right: 0;
+	  }
+	  @else{
+		margin-right: $wtf-grid-gutter;
+	  }
+	}
+  }
+
+  &:last-child {
+	margin-right: 0;
+  }
+
+}
+
+
+
+@function centered-element-width($column-count) {
+
+  $value: ( $wtf-grid-width - (($column-count - 1) * $wtf-grid-gutter)) / $column-count;
+  @return $value;
+}
+
+
+
+@mixin centered-column($column-count, $padding-columns: false) {
+
+  $width: centered-element-width($column-count);
+  width: $width;
+  margin-top: ($wtf-grid-margin / 2);
+  margin-bottom: ($wtf-grid-margin / 2 );
+
+  @include centered-element-margins($column-count);
+}
+
+
+
+@mixin centered-grid($block, $grid-settings) {
+
+  #{$block} {
+	@include centered-column($wtf-grid-columns / $wtf-grid-columns);
+  }
+
+  @each $grid in $grid-settings {
+
+	@include mq(nth($grid, 1)) {
+
+	  #{$block} {
+		@include centered-column(nth($grid, 2));
+	  }
+	}
+  }
+}
+
+
+
+
+
+@mixin centered-grid-parent($block, $column-width) {
+
+  $column-count: $wtf-grid-columns / $column-width;
+
+  #{$block} {
+	@include centered-column($column-count);
+  }
+}
+
+
+@mixin blocks-grid-parent($block, $column-width) {
+
+  @include grid-positions($block, $column-width);
+
+  #{$block} {
+	@include column($column-width);
+  }
+}
+
+/// SUPERMIXIN
+
+@mixin use-grid($grid-type, $block, $grid-settings){
+
+  $type-switch: type-of($grid-settings);
+
+  @if $type-switch == "list" {
+
+	@if $grid-type == 'centered' {
+	  @include centered-grid($block, $grid-settings);
+	}
+	@else if $grid-type == 'blocks' {
+	  @include blocks-grid($block, $grid-settings);
+	}
+	@else {
+	  @include blocks-grid($block, $grid-settings);
+	}
+  }
+  @else {
+
+	@if $grid-type == 'centered' {
+	  @include centered-grid-parent($block, $grid-settings);
+	}
+	@else if $grid-type == 'blocks' {
+	  @include blocks-grid-parent($block, $grid-settings);
+	}
+	@else {
+	  @include blocks-grid-parent($block, $grid-settings);
+	}
+  }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin prefixer
+//
+// $property - CSS vlastnost
+// $value - hodnota/y
+//
+// @author:		mke + jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @example: @include prefixer(border-radius, 4px);
+// @source: http://css-tricks.com/how-to-deal-with-vendor-prefixes/
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin prefixer($property, $value...) {
+  @if $property == transition {
+	@include prefix($property, webkit spec, $value);
+  } @else if $property == animation {
+	@include prefix($property, webkit spec, $value);
+  } @else if $property == column-count {
+	@include prefix($property, webkit moz spec, $value);
+  } @else if $property == column-width {
+	@include prefix($property, webkit moz spec, $value);
+  } @else if $property == column-gap {
+	@include prefix($property, webkit moz spec, $value);
+  } @else if $property == transform {
+	@include prefix($property, webkit ms spec, $value);
+  } @else if $property == filter {
+	@include prefix($property, webkit spec, $value);
+  } @else if $property == backface-visibility {
+	@include prefix($property, webkit spec, $value);
+  }
+  @else {
+	#{$property}: $value;
+  }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin prefix
+//
+// $property - CSS vlastnost
+// $prefixes - seznam pozadovanych prefixu
+// $value - hodnota/y
+//
+// @author:		mke + jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @example: @include prefix(border-radius, webkit moz, 4px);
+// @source: https://github.com/thoughtbot/bourbon
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin prefix($property, $prefixes, $value...) {
+  @each $pre in $prefixes {
+	@if $pre == webkit {
+	  -webkit-#{$property}: $value;
+	}
+	@else if $pre == moz {
+	  -moz-#{$property}: $value;
+	}
+	@else if $pre == ms {
+	  -ms-#{$property}: $value;
+	}
+	@else if $pre == o {
+	  -o-#{$property}: $value;
+	}
+	@else if $pre == spec {
+	  #{$property}: $value;
+	}
+	@else  {
+	  @warn "Neznamy prefix: #{$pre}";
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @function color-alpha
+//
+// $color - barva v HEX
+// $set-alpha - nastaveni alpha kanalu [0 - 1]
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@function color-alpha($color, $set-alpha) {
+  @if $set-alpha {
+	@return change_color($color, $alpha: $set-alpha);
+  }
+  @else {
+	@return $color;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @function get-map-value
+//
+// $map - id mapy, z ktere se maja nacist daa
+// $map-id - promena, ktera se ma z mapy nacist
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@function get-map-value($map, $key) {
+  $key-in-map: map-has-key($map, $key);
+
+  @if $key-in-map == true {
+	$color-setting: map_get($map, $key);
+	$set-alpha: false;
+
+	$color: nth($color-setting, 1);
+
+	@if length($color-setting) == 2 {
+	  $set-alpha: nth($color-setting, 2);
+	  $color: color-alpha($color, $set-alpha);
+	}
+
+	@return $color;
+  } @else {
+	@return false;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @function map-depth
+//
+// vrati pocet urovni mapy
+//
+// @author:		pan
+// @date:		06.06.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@function map-depth($map) {
+  $level: 1;
+
+  @each $key, $value in $map {
+	@if type-of($value) == "map" {
+	  $level: max(map-depth($value) + 1, $level);
+	}
+  }
+
+  @return $level;
+}
+
+// @mixin get-css
+// export css property from SASS map
+//
+// @version:			1.0
+// @date:				24.01.2015
+// @author:				jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin get-css($map, $one: false, $multiple: 1, $value: false, $operation: false) {
+  $multiple-values: (
+		  padding-top,
+		  padding-bottom,
+		  padding-left,
+		  padding-right,
+		  margin-top,
+		  margin-bottom,
+		  margin-left,
+		  margin-right,
+  );
+
+  @each $property, $source in $map {
+	$all-property: true;
+
+	@if $one != false {
+	  $all-property: false;
+	}
+
+	@if $one == $property {
+	  $all-property: true;
+	}
+
+	@if $all-property {
+	  @if $property == 'animation' {
+		@include animation($source);
+	  }
+	  @else if $property == 'transform' {
+		@include transform($source);
+	  }
+	  @else if $property == 'transition' {
+		@include transition($source);
+	  }
+	  @else if $property == 'border-radius' {
+		@include border-radius($source);
+	  }
+	  @else if $property == 'opacity' {
+		@include opacity($source);
+	  }
+	  @else if $property == 'font-family' {
+		@if $source != 'inherit' {
+		  @include font-family($source);
+		} @else {
+		  font-family: $source;
+		}
+	  }
+	  @else if $property == 'font' {
+		@include font($font-size: nth($source, 1), $line-height: nth($source, 2), $modifier: $operation);
+	  }
+	  @else if $property == 'font-size' {
+		@if length($source) == 2 {
+		  $source-font-size: ceil(nth($source, 1) * $multiple);
+		  $source-important: nth($source, 2);
+		  @include font-size($source-font-size, $source-important, $operation);
+		} @else {
+		  $source: ceil($source * $multiple);
+		  @include font-size($font-size: $source, $modifier: $operation)
+		}
+	  }
+	  @else if $property == 'line-height' {
+		@if length($source) == 2 {
+		  $source-line-height: ceil(nth($source, 1) * $multiple);
+		  $source-font-size: ceil(nth($source, 2) * $multiple);
+
+		  @include line-height($line-height: $source-line-height, $font-size: $source-font-size, $modifier: $operation);
+		} @elseif length($source) == 3 {
+		  $source-line-height: ceil(nth($source, 1) * $multiple);
+		  $source-font-size: ceil(nth($source, 2) * $multiple);
+		  $source-important: nth($source, 3);
+
+		  @include line-height($source-line-height, $source-font-size, $source-important, $operation);
+		} @else {
+		  $source: ceil($source * $multiple);
+		  line-height: $source;
+		}
+	  }
+	  @else {
+		@if $property != '' {
+		  // overeni, zda je mozne pouzit nasobic
+		  @if index($multiple-values, $property) != null {
+
+
+			@if $value == false {
+			  $source: ceil($source * $multiple);
+			}
+			@else {
+			  @if $operation == '+' {
+				$source: $source + $value;
+			  }
+
+			  @if $operation == '-' {
+				$source: $source - $value;
+			  }
+
+			  @if $operation == '*' {
+				$source: $source * $value;
+			  }
+
+			  @if $operation == '/' {
+				$source: $source / $value;
+			  }
+			}
+
+		  }
+
+		  #{$property}: $source;
+		}
+	  }
+	}
+  }
+}
+
+
+// @mixin responsive
+// generate resonsive css from SASS map
+//
+// @version:			1.0
+// @date:				24.01.2014
+// @author:				jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin responsive($maps, $one: false, $multiple: 1, $step: false, $value: false, $operation: false) {
+  $step-in: 0;
+
+  @each $bp, $map in $maps {
+
+	@if $step == false {
+
+	  @if $bp == 0 {
+		@include get-css($map, $one, $multiple, $value, $operation);
+	  } @else if type-of($bp) == string {
+		@include mqd($bp) {
+		  @include get-css($map, $one, $multiple, $value, $operation);
+		}
+	  } @else {
+		@include mq($bp) {
+		  @include get-css($map, $one, $multiple, $value, $operation);
+		}
+	  }
+
+	} @else {
+	  @if $step == $step-in {
+		@include get-css($map, $one, $multiple, $value, $operation);
+	  }
+	}
+
+	$step-in: $step-in + 1;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @function map-map
+//
+// vrati pozadovanou promennou z vnorene mapy
+// $parent	- oznaceni rodicovske mapy
+// $child	- identifikator vnorene mapy
+// $value	- pozadovana promena
+//
+// @author:		jbe
+// @date:		19.03.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
+@function map-map($parent, $child, $value) {
+  @return map-get(map-get($parent, $child), $value);
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @function extend-map
+//
+// slucovani definic barev do map
+//
+// @author:		jbe
+// @date:		30.03.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@function extend-map($map, $add-map) {
+  $new-map: map_merge($map, $add-map);
+  @return $new-map;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin:		color-selector
+//
+// @author:		jbe
+// @date:		01.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin selectors($section, $additive, $layout: false, $section-class: false, $wnd-cms: false) {
+  @if $layout {		// layoutove obarvovani
+	@if $layout == true { // obarvovani sekci
+	  @if $wnd-cms {
+		body:not(.wnd-cms) {
+		  .#{$section} {
+			@if $section-class {
+			  &.#{$section-class} {
+				@content;
+			  }
+			} @else {
+			  @content;
+			}
+		  }
+		}
+	  }
+	  @else {
+		body .#{$section} {
+		  @if $section-class {
+			&.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	}
+	@else { // obarvovani celeho layoutu
+	  @if $wnd-cms {
+		body.#{$layout}:not(.wnd-cms) {
+		  // pouze pro frontend
+		  @if $section-class {
+			.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  } @else {
+		.#{$layout} {
+		  @if $section-class {
+			.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	}
+  } @else {			// sekcni obarvovani s doplnkovou barvou
+	@if $additive {
+	  .#{$additive} {
+		@if $wnd-cms {
+		  &:not(.wnd-cms) {
+			@if $section-class {
+			  .#{$section}.#{$section-class} {
+				@content;
+			  }
+			}
+			@else {
+			  .#{$section} {
+				@content;
+			  }
+			}
+		  }
+		} @else {
+		  @if $section-class {
+			.#{$section}.#{$section-class} {
+			  @content;
+			}
+		  }
+		  @else {
+			.#{$section} {
+			  @content;
+			}
+		  }
+		}
+	  }
+	} @else {
+	  @if $wnd-cms {
+		body:not(.wnd-cms) {
+		  @if $section-class {
+			.#{$section}.#{$section-class} {
+			  @content;
+			}
+		  }
+		  @else {
+			.#{$section} {
+			  @content;
+			}
+		  }
+		}
+	  } @else {
+		@if $section-class {
+		  .#{$section}.#{$section-class} {
+			@content;
+		  }
+		}
+		@else {
+		  .#{$section} {
+			@content;
+		  }
+		}
+	  }
+	}
+  }
+}
+
+
+@mixin color-selector($section, $additive, $wnd-cms: false) {
+  @if $additive {
+	.#{$additive} {
+	  @if $wnd-cms {
+		&:not(.wnd-cms) {
+		  .#{$section} {
+			@content;
+		  }
+		}
+	  } @else {
+		.#{$section} {
+		  @content;
+		}
+	  }
+	}
+  } @else {
+	@if $wnd-cms {
+	  body:not(.wnd-cms) {
+		.#{$section} {
+		  @content;
+		}
+	  }
+	} @else {
+	  .#{$section} {
+		@content;
+	  }
+	}
+  }
+}
+
+@mixin layout-selector($section, $additive, $layout: false, $section-class: false, $wnd-cms: false) {
+  @if $layout == true { // obarvovani sekci
+	@if $wnd-cms {
+	  body:not(.wnd-cms) {
+		.#{$section} {
+		  @if $section-class {
+			&.#{$section-class} {
+			  @content;
+			}
+		  } @else {
+			@content;
+		  }
+		}
+	  }
+	}
+	@else {
+	  body .#{$section} {
+		@if $section-class {
+		  &.#{$section-class} {
+			@content;
+		  }
+		} @else {
+		  @content;
+		}
+	  }
+	}
+  }
+  @else { // obarvovani celeho layoutu
+	//.#{$layout} {
+	@if $wnd-cms {
+	  body.#{$layout}:not(.wnd-cms) { // pouze pro frontend
+		@if $section-class {
+		  .#{$section-class} {
+			@content;
+		  }
+		} @else {
+		  @content;
+		}
+	  }
+	}
+	@else {
+	  .#{$layout} {
+		@if $section-class {
+		  .#{$section-class} {
+			@content;
+		  }
+		} @else {
+		  @content;
+		}
+	  }
+	}
+	//}
+  }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin:		section-bg
+//
+// @author:		jbe
+// @date:		01.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin section-bg($layout-color: false) {
+  @if type-of($layout-color) == bool {
+	@content;
+  }
+}
+
+// mixin pro generování selectoru obarvovacího systému
+
+@mixin color-select($sc: false, $ac: false, $addSections: false) {
+
+  // Additivní barva + barva sekce
+  @if $ac != false {
+	// Podmínka na additivní barvu
+	@if $ac == $additive-color {
+	  // Podmínka na sekční barvu
+	  @if $sc != false {
+		@each $color in $sc {
+		  @if $color == $section-color {
+			.#{$additive-color} .#{$section-color} {
+			  @content;
+			}
+		  }
+		}
+	  } @else { // pokud není specifikovaná sekční barva, aplikovat jen na aditivní - nutný zápis volání argumentu s proměnnou ($ac : color-pink)
+		body .#{$additive-color} {
+		  @content;
+		}
+	  }
+	}
+  } @else if $sc != false {
+	// Sekční barva
+	@each $color in $sc {
+	  @if $layout-color != false AND $section-color == false {
+		// Projít všech barev zda se některá nerovná
+		@if $color == $layout-color {
+
+		  @if $addSections == true {
+			// Přidá navíc totéž, ale jen pro sekce. U šablon, kde je section-color i na layoutu (06-portfolio)
+			// je třeba zajistit, aby pravidlo pro sekci bylo silnější než pravidlo pro layout.
+			// Pravidlo pro layout je však nutné ponechat, protože je pak použito pro section-none.
+			.#{$layout-color},
+			.section.#{$layout-color} {
+			  @content;
+			}
+		  } @else {
+			.#{$layout-color} {
+			  @content;
+			}
+		  }
+
+		}
+	  } @else {
+		// Projít všech barev zda se některá nerovná
+		@if $color == $section-color {
+
+		  @if $addSections == true {
+			// Přidá navíc totéž, ale jen pro sekce. U šablon, kde je section-color i na layoutu (06-portfolio)
+			// je třeba zajistit, aby pravidlo pro sekci bylo silnější než pravidlo pro layout.
+			// Pravidlo pro layout je však nutné ponechat, protože je pak použito pro section-none.
+			.#{$section-color},
+			.section.#{$section-color} {
+			  @content;
+			}
+		  } @else {
+			.#{$section-color} {
+			  @content;
+			}
+		  }
+
+		}
+	  }
+	}
+  }
+}
+
+// mixin pro generování selectoru pro hover
+
+
+@mixin hover($type:'') {
+
+  @if $type == 'cms' {
+
+	&:hover {
+	  body.wnd-cms:not(.touched) & {
+		@content;
+	  }
+	}
+
+  } @else if $type == 'menu' {
+
+	&:hover {
+	  body:not(.touched) & {
+		@content;
+	  }
+	}
+
+  }
+  @else {
+
+	&:hover {
+	  body:not(.touched):not(.wnd-cms) & {
+		@content;
+	  }
+	}
+
+  }
+
+}
+
+// Mixin pro pozicování claimu v sekcích
+
+@mixin claim-position($position-x: center, $position-y: center, $claim: h1) {
+
+  @if $position-y == top {
+	vertical-align: top;
+  }
+
+  @if $position-y == center {
+	vertical-align: middle;
+  }
+
+  @if $position-y == bottom {
+	vertical-align: bottom;
+  }
+
+  #{$claim} {
+	@if $position-x == left {
+	  text-align: left;
+	  float: left;
+	  margin: 40px 0;
+	}
+
+	@if $position-x == center {
+	  text-align: center;
+	  margin: 40px auto;
+	}
+
+	@if $position-x == right {
+	  text-align: right;
+	  float: right;
+	  margin: 40px 0;
+	}
+
+	@content;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin clearfix
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin clearfix {
+  &:before,
+  &:after {
+	content: "";
+	display: table;
+  }
+  &:after {
+	clear: both;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin box-sizing
+//
+// $model - [content-box, border-box] vychozi hodnota border-box
+// $important - [true, false] pridani parametru important k pravidlu.
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin box-sizing($model: border-box, $important: false) {
+  $imp: '';
+
+  @if $important {
+	$imp: ' important!';
+  }
+
+  @if $model {
+	box-sizing: $model#{$imp};
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin border-radius
+//
+// $radius - hodnota radiusu
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @example: border-radius(topleft topright bottomright bottomleft);
+//
+// background-clip: http://tumble.sneak.co.nz/post/928998513/fixing-the-background-bleed
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin border-radius($radius) {
+  @if $radius {
+	border-radius: $radius;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin css-column
+//
+// $count - pocet sloupcu
+// $width - sirka sloupce [px, %]
+// $gap - sirka mezery mezi sloupci [px, %]
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @source: http://jecas.cz/column
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin css-column($count: 2, $width: 0, $gap: 0) {
+  @include prefixer(column-count, $count);
+
+  @if( $width != 0 ) {
+	@include prefixer(column-width, $width);
+  }
+
+  @if( $gap > 0 ) {
+	@include prefixer(column-gap, $gap);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin vertical-align
+//
+// vertical align center
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin vertical-align($top: 50%, $important: false) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @include transform(translateY(-50%));
+  position: relative#{$imp};
+  top: $top#{$imp};
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin horizontal center
+//
+// $max-width - zadani max. sirky prvky [px, %]
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin horizontal-center($max-width) {
+  width: 100%;
+  max-width: $max-width;
+  margin: 0 auto;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin sections-source
+//
+// projde responsivni mapu chovani section a vygeneruje prislusne CSS
+//
+// 1]	breakpoint [px]
+// 2]	sirka section-inneru [px]
+// 3]	padding top/bottom [px]
+// 4]	padding left/right [px]
+// 5]	section-inner position [center, left, right]
+//
+//
+// $top/$bottom - nasobic padding top/bottom
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin sections-source($source, $top: false, $bottom: false) {
+  $padding-top: '';
+  $padding-bottom: '';
+
+  @each $section in $source {
+	@if($top != false) {
+	  $padding-top: ceil(nth($section, 3) * $top);
+	}
+	@else {
+	  $padding-top: nth($section, 3);
+	}
+
+	@if($bottom != false) {
+	  $padding-bottom: ceil(nth($section, 3) * $bottom);
+	}
+	@else {
+	  $padding-bottom: nth($section, 3);
+	}
+
+	@if( nth($section, 1) == 0 ) {
+	  max-width: nth($section, 2);
+	  padding: $padding-top nth($section, 4) $padding-bottom;
+
+	  @if nth($section, 5) == center {
+		margin: 0 auto !important;
+	  }
+	  @else {
+		float: nth($section, 5);
+	  }
+	}
+	@else {
+	  @include mq(nth($section, 1)) {
+		max-width: nth($section, 2);
+		padding: $padding-top nth($section, 4) $padding-bottom;
+
+		@if nth($section, 5) == center {
+		  margin: 0 auto !important;
+		}
+		@else {
+		  float: nth($section, 5);
+		}
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin block-space
+//
+// z mapy $wtf-blocks-space vygeneruje responsivni padding pro bloky
+//
+// $top-bottom - nasobek pro padding top a bottom
+// $left-right - nasobek pro padding left a right
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin block-space($top: 1, $right: 1, $bottom: false, $left: false, $important: false) {
+  $t: '';
+  $r: '';
+  $b: '';
+  $l: '';
+
+  @each $block in $wtf-blocks-space {
+	@if $bottom {
+	  $t: ceil(nth($block, 2) * $top);
+	  $b: ceil(nth($block, 2) * $bottom);
+	} @else {
+	  $t: ceil(nth($block, 2) * $top);
+	  $b: $t;
+	}
+
+	@if $left {
+	  $r: ceil(nth($block, 2) * $right);
+	  $l: ceil(nth($block, 2) * $left);
+	} @else {
+	  $r: ceil(nth($block, 2) * $right);
+	  $l: $r;
+	}
+
+	// osetreni 0px
+	@if $t == 0px {
+	  $t: 0;
+	}
+	@if $r == 0px {
+	  $r: 0;
+	}
+	@if $b == 0px {
+	  $b: 0;
+	}
+	@if $l == 0px {
+	  $l: 0;
+	}
+
+	@if( nth($block, 1) == 0 ) {
+	  @if $important {
+		padding: $t $r $b $l !important;
+	  } @else {
+		padding: $t $r $b $l;
+	  }
+	}
+	@else {
+	  @include mq(nth($block, 1)) {
+		@if $important {
+		  padding: $t $r $b $l !important;
+		} @else {
+		  padding: $t $r $b $l;
+		}
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin object-fit
+//
+// @author:		pan
+// @date:		03.05.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin object-fit($type: cover, $position: center center) {
+
+  object-fit: $type;
+  object-position: $position;
+  //font-family: 'object-fit: #{$type}; object-position: #{$position};';
+
+  //background-size: $type;
+  //background-position: $position;
+  //background-repeat: no-repeat;
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin wtf-column-width
+//
+// z mapy $wtf-column-width vygeneruje responsivni margin-left a margin-right
+//
+// $left: false - nevygeneruje se margin-left
+// $right: false - nevygeneruje se margin-right
+//
+// @author:		jbe
+// @date:		02.02.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin column-margin($left: true, $right: true, $important: false) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @each $mq, $width in $wtf-column-width {
+	@include mq($mq) {
+	  $margin: (100% - $width) / 2;
+
+	  @if $left {
+		margin-left: $margin#{$imp};
+	  }
+
+	  @if $right {
+		margin-right: $margin#{$imp};
+	  }
+	}
+  }
+}
+
+
+@mixin column-padding($left: true, $right: true, $important: false) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @each $mq, $width in $wtf-column-width {
+	@include mq($mq) {
+	  $padding: (100% - $width) / 2;
+
+	  @if $left {
+		padding-left: $padding#{$imp};
+	  }
+
+	  @if $right {
+		padding-right: $padding#{$imp};
+	  }
+	}
+  }
+}
+
+@mixin column-width($attr: margin, $left: true, $right: true, $important: false, $column-width-map: $wtf-column-width, $multiple: 1) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  // podle nastaveni nastavit delitele
+  $factor: 2;
+  @if( $left == false or $right == false ) {
+	$factor: 1;
+  }
+
+  @each $mq, $width in $column-width-map {
+	@include mq($mq) {
+	  $space: ((100% - $width) / $factor) * $multiple;
+
+	  @if $left {
+		#{$attr}-left: $space#{$imp};
+	  }
+
+	  @if $right {
+		#{$attr}-right: $space#{$imp};
+	  }
+	}
+  }
+}
+
+// z mapy $wtf-column-width vygeneruje responsivni absolutní pozicování
+@mixin column-width-position($top: false, $bottom: false, $leftinitial: 0, $rightinitial: 0, $important: false) {
+
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  position: absolute;
+  left: $leftinitial#{$imp};
+  right: $rightinitial#{$imp};
+
+  @if $top {
+	top: $top#{$imp};
+  }
+  @if $bottom {
+	bottom: $bottom#{$imp};
+  }
+
+  @each $mq, $width in $wtf-column-width {
+	@include mq($mq) {
+	  $space: (100% - $width) / 2;
+	  left: $space#{$imp};
+	  right: $space#{$imp};
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin position
+//
+// @author:		jbe
+// @date:		16.02.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin position($type: absolute, $top: 0, $left: 0, $bottom: false, $right: false) {
+  @if $type {
+	position: $type;
+  }
+
+  @if $top {
+	top: $top;
+  }
+
+  @if $left {
+	left: $left;
+  }
+
+  @if $bottom {
+	bottom: $bottom;
+  }
+
+  @if $right {
+	right: $right;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin block-padding
+//
+// z mapy $wtf-column-width vygeneruje responsivni padding-left a padding-right
+//
+// $left: false - nevygeneruje se margin-left
+// $right: false - nevygeneruje se margin-right
+// $important: true - vygeneruje !important
+//
+// @author:		jbe
+// @date:		02.02.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin block-padding($source: $wtf-column-width, $left: true, $right: true, $important: false, $multiple: 1) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @each $column in $source {
+	@include mq(nth($column, 1)) {
+	  $padding: ((100% - nth($column, 2)) / 2) * $multiple;
+
+	  @if $left {
+		padding-left: $padding#{$imp};
+	  }
+
+	  @if $right {
+		padding-right: $padding#{$imp};
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin embed-link
+//
+// @author:		jbe
+// @date:		07.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+@mixin embed-link() {
+
+  &:after {
+	content: '';
+	@include position(absolute, 0, 0, 0, 0);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin keyframes
+//
+// $name - nazev animace
+// do slozenych zavorek pak zapis prubeh animace
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} {
+	@content;
+  }
+  @-moz-keyframes #{$name} {
+	@content;
+  }
+  @-ms-keyframes #{$name} {
+	@content;
+  }
+  @-o-keyframes #{$name} {
+	@content;
+  }
+  @keyframes #{$name} {
+	@content;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin animation
+//
+// $value - zapis animace podle syntaxe
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin animation($value...) {
+  @if $value {
+	@include prefixer(animation, $value);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin transform
+//
+// $value - zapis transofmace podle syntaxe
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin transform($value...) {
+  @if $value {
+	@include prefixer(transform, $value...);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin transition
+//
+// $value
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin transition($value...) {
+  @if $value != false {
+	@include prefixer(transition, $value);
+  }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin backface-visibility
+//
+// $value
+//
+// @author:		jbe
+// @date:		13.09.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin backface-visibility($value...) {
+  @if $value != false {
+	@include prefixer(backface-visibility, $value);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin mq
+//
+// media query mixin
+//
+// $min-width
+// $max-width
+// $min-height
+// $max-height
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin mq($min-width: false, $max-width: false, $min-height: false, $max-height: false) {
+
+  $m-width: '';
+  $x-width: '';
+  $m-height: '';
+  $x-height: '';
+  $and: ' and (';
+  $end: ')';
+  $mw: 'min-width: ';
+  $xw: 'max-width: ';
+  $mh: 'min-height: ';
+  $xh: 'max-height: ';
+
+  @if $min-width {
+	$m-width: #{$and}#{$mw}$min-width#{$end};
+  }
+
+  @if $max-width {
+	$x-width: #{$and}#{$xw}$max-width#{$end};
+  }
+
+  @if $min-height {
+	$m-height: #{$and}#{$mh}$min-height#{$end};
+  }
+
+  @if $max-height {
+	$x-height: #{$and}#{$xh}$max-height#{$end};
+  }
+
+  @media all#{$m-width}#{$x-width}#{$m-height}#{$x-height} {
+	@content;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin mqd
+//
+// media query device mixin
+// $device [mobile, tablet, desktop]
+//
+// @source: https://css-tricks.com/snippets/css/retina-display-media-query/
+//
+// @author:		jbe
+// @date:		17.03.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin mqd($device) {
+  @if $device == 'mobile' {
+	@media
+	only screen and (-webkit-min-device-pixel-ratio: 2)      and (min-width: 320px),
+	only screen and (   min--moz-device-pixel-ratio: 2)      and (min-width: 320px),
+	only screen and (     -o-min-device-pixel-ratio: 2/1)    and (min-width: 320px),
+	only screen and (        min-device-pixel-ratio: 2)      and (min-width: 320px),
+	only screen and (                min-resolution: 192dpi) and (min-width: 320px),
+	only screen and (                min-resolution: 2dppx)  and (min-width: 320px) {
+	  @content;
+	}
+  }
+
+  @if $device == 'tablet' {
+	@media
+	only screen and (-webkit-min-device-pixel-ratio: 2)      and (min-width: 700px),
+	only screen and (   min--moz-device-pixel-ratio: 2)      and (min-width: 700px),
+	only screen and (     -o-min-device-pixel-ratio: 2/1)    and (min-width: 700px),
+	only screen and (        min-device-pixel-ratio: 2)      and (min-width: 700px),
+	only screen and (                min-resolution: 192dpi) and (min-width: 700px),
+	only screen and (                min-resolution: 2dppx)  and (min-width: 700px) {
+	  @content;
+	}
+  }
+
+  @if $device == 'max-tablet' {
+	@media
+	only screen and (-webkit-min-device-pixel-ratio: 2)      and (max-width: 700px),
+	only screen and (   min--moz-device-pixel-ratio: 2)      and (max-width: 700px),
+	only screen and (     -o-min-device-pixel-ratio: 2/1)    and (max-width: 700px),
+	only screen and (        min-device-pixel-ratio: 2)      and (max-width: 700px),
+	only screen and (                min-resolution: 192dpi) and (max-width: 700px),
+	only screen and (                min-resolution: 2dppx)  and (max-width: 700px) {
+	  @content;
+	}
+  }
+
+  @if $device == 'desktop' {
+	@media
+	only screen and (-webkit-min-device-pixel-ratio: 2)      and (min-width: 1300px),
+	only screen and (   min--moz-device-pixel-ratio: 2)      and (min-width: 1300px),
+	only screen and (     -o-min-device-pixel-ratio: 2/1)    and (min-width: 1300px),
+	only screen and (        min-device-pixel-ratio: 2)      and (min-width: 1300px),
+	only screen and (                min-resolution: 192dpi) and (min-width: 1300px),
+	only screen and (                min-resolution: 2dppx)  and (min-width: 1300px) {
+	  @content;
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-family
+//
+// @author:		jma
+// @date:		18.04.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Mixin pro definici font-family vcetne fallbacku.
+// Vola se s promennou dle prvniho klice sass mapy nize, tj. např. @include font-family('Abril FatFace');
+//
+// Vystupem mixinu je styl pro aktualni selektor, obsahujici zapis font-family vcetne spravneho nazvu pisma
+// a vcetne fallbackovych pisem. Vyhodou je sprava "realnych" nazvu pisem a fallbacků pro tato pisma na jednom
+// miste a to zde. Zaroven vhodnym pojmenovanim "realneho" nazvu pisma lze zajistit zda se pismo vezme z Typekitu
+// nebo se pouzije lokalni sada pisma. Krome stylu pro aktualni selektor je vygenerovan jeste styl s predrazenou
+// tridou .wnd-fonts-fallback pro zajisteni tzv. nuceneho fallbacku.
+//
+// Mixin vyuziva funkci font-family($font-family,$type) ktera zajistuje cteni ze sass podmapy v mape pisma.
+// Tato funkce je krome volani z mixinu font-family volana jeste z base-style.css kazdeho ui-kitu, kde je potreba
+// ziskat spravny zapis jen pro fallbackova pisma a pak spravny zapis pro pismo vcetne fallbackovych pisem.
+
+$font-families: (
+		'Abril FatFace': (
+				realname: 'Abril FatFace',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Brandon Grotesque': (
+				realname: 'brandon-grotesque',
+				fallback: ('Arial', sans-serif),
+				specialfallback: ('Noto Sans', 'Arial', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Arial', sans-serif)
+		),
+		'Fira Sans': (
+				realname: 'fira-sans',
+				fallback: ('Trebuchet MS', sans-serif),
+				specialfallback: ('Noto Sans', 'Trebuchet MS', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Trebuchet MS', sans-serif)
+		),
+		'Lobster': (
+				realname: 'Lobster',
+				fallback: ('Georgia', serif),
+				specialfallback: ('Noto Serif', 'Georgia', serif),
+				jpfallback: ('Noto Sans Japanese', 'Georgia', serif)
+		),
+		'Lora': (
+				realname: 'Lora',
+				fallback: ('Georgia', serif),
+				specialfallback: ('Noto Serif', 'Georgia', serif),
+				jpfallback: ('Noto Sans Japanese', 'Georgia', serif)
+		),
+		'Open Sans': (
+				realname: 'Open Sans',
+				fallback: ('Trebuchet MS', sans-serif),
+				specialfallback: ('Noto Sans', 'Trebuchet MS', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Trebuchet MS', sans-serif)
+		),
+		'Playfair Display': (
+				realname: 'Playfair Display',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Proxima Nova': (
+				realname: 'proxima-nova',
+				fallback: ('Helvetica', 'Arial', sans-serif),
+				specialfallback: ('Noto Sans', 'Helvetica', 'Arial', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Helvetica', 'Arial', sans-serif)
+		),
+		'PT Serif': (
+				realname: 'pt-serif',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Reklame Script': (
+				realname: 'reklame-script',
+				fallback: ('Georgia', serif),
+				specialfallback: ('Noto Serif', 'Georgia', serif),
+				jpfallback: ('Noto Sans Japanese', 'Georgia', serif)
+		),
+		'Ribeye Marrow': (
+				realname: 'Ribeye Marrow',
+				fallback: ('Times New Roman', serif),
+				specialfallback: ('Noto Serif', 'Times New Roman', serif),
+				jpfallback: ('Noto Sans Japanese', 'Times New Roman', serif)
+		),
+		'Roboto': (
+				realname: 'Roboto',
+				fallback: ('Arial', sans-serif),
+				specialfallback: ('Noto Sans', 'Arial', sans-serif),
+				jpfallback: ('Noto Sans Japanese', 'Arial', sans-serif)
+		),
+);
+
+@function get-font-family($font-family,$type) {
+  @return map-get(map-get($font-families, $font-family),$type);
+}
+
+@mixin font-family($font-family, $type: false) {
+  @if $type == normal {
+	font-family: get-font-family($font-family, 'realname'), get-font-family($font-family, 'fallback');
+  } @else if $type == special {
+	font-family: get-font-family($font-family, 'specialfallback');
+  } @else if $type == japanese {
+	font-family: get-font-family($font-family, 'jpfallback');
+  } @else {
+	font-family: get-font-family($font-family, 'realname'), get-font-family($font-family, 'fallback');
+
+	.wnd-fonts-fallback & {
+	  font-family: get-font-family($font-family, 'specialfallback');
+	}
+
+	html[lang='ja'] .wnd-fonts-fallback & {
+	  font-family: get-font-family($font-family, 'jpfallback');
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-size
+//
+// prevod font-size z PX na REM
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin font-size($font-size, $important: false, $modifier: false) {
+  @if $modifier == false {
+	@if ($font-size == 17px OR $font-size == 15px) {
+	  $font-size: $font-size + 0.2px;
+	}
+  }
+
+  @if $important {
+	@if $wtf-ie8-support == true OR $modifier == 'precise' {
+	  font-size: ($font-size) !important;
+	}
+	@else {
+	  font-size: (($font-size / 16px) * 1rem) !important;
+	}
+  }
+  @else {
+	@if $wtf-ie8-support == true OR $modifier == 'precise' {
+	  font-size: ($font-size);
+	}
+	@else {
+	  font-size: (($font-size / 16px) * 1rem);
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin line-height
+//
+// prevod vysky radku v PX na pomer k font-size
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin line-height($line-height, $font-size, $important: false, $modifier: false) {
+
+  @if $modifier == precise {
+
+	@if $important {
+	  line-height: $line-height !important;
+	}@else{
+	  line-height: $line-height;
+	}
+
+  } @else {
+
+	@if $important {
+	  line-height: ceil($font-size / $line-height) * ($line-height / $font-size) !important;
+	} @else {
+	  line-height: ceil($font-size / $line-height) * ($line-height / $font-size);
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-face
+//
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+@mixin font-face($family, $folder, $file, $weight, $style, $woff2: true) {
+  @font-face {
+	font-family: '#{$family}';
+
+	@if $woff2 {
+	  src: url('../fonts/#{$folder}/#{$file}.woff2') format('woff2'),
+	  url('../fonts/#{$folder}/#{$file}.woff') format('woff'),
+	  url('../fonts/#{$folder}/#{$file}.ttf') format('truetype');
+	} @else {
+	  src: url('../fonts/#{$folder}/#{$file}.woff') format('woff'),
+	  url('../fonts/#{$folder}/#{$file}.ttf') format('truetype');
+	}
+
+	font-weight: $weight;
+	font-style: $style;
+	font-rendering: swap 500ms;
+	font-display: swap;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-face
+//
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin no-narrow {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  p:last-child,
+  ul,
+  ol,
+  blockquote {
+	margin-left: 0;
+	margin-right: 0;
+  }
+
+  blockquote {
+	p,
+	p:last-of-type {
+	  margin-right: 0;
+	  margin-left: 0;
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font-source
+//
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin font-source($source) {
+  $font-weight: '';
+  $font-style: '';
+
+  @each $font in $source {
+	@if( nth($font, 1) == 0 ) {
+	  @include font-size(nth($font, 2));
+	  @include line-height(nth($font, 3), nth($font, 2));
+	  font-weight: nth($font, 4);
+	  $font-weight: nth($font, 4);
+
+	  font-style: nth($font, 5);
+	  $font-style: nth($font, 5);
+	}
+	@else {
+	  @include mq(nth($font, 1)) {
+		@include font-size(nth($font, 2));
+		@include line-height(nth($font, 3), nth($font, 2));
+
+		@if( $font-weight != nth($font, 4) ) {
+		  font-weight: nth($font, 4);
+		  $font-weight: nth($font, 4);
+		}
+
+		@if( $font-style != nth($font, 5) ) {
+		  font-style: nth($font, 5);
+		  $font-style: nth($font, 5);
+		}
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin element-padding
+//
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin element-padding($source, $multiple: 1) {
+  $padding: '';
+
+  @each $data in $source {
+	@if (nth($data, 1) == 0) {
+	  padding-bottom: ceil(nth($data, 2) * $multiple);
+	  $padding: ceil(nth($data, 2) * $multiple);
+	} @else {
+	  @include mq(nth($data, 1)) {
+		@if ($padding != ceil(nth($data, 2) * $multiple)) {
+		  padding-bottom: ceil(nth($data, 2) * $multiple);
+		  $padding: ceil(nth($data, 2) * $multiple);
+		}
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin font
+//
+// @author:		jbe
+// @date:		12.06.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin font($font-size, $line-height, $font-family: false, $font-weight: false, $important: false, $modifier: false) {
+
+  @include font-size($font-size, $important, $modifier);
+  @include line-height($line-height, $font-size, $important, $modifier);
+
+  @if $font-family {
+	@include font-family($font-family);
+  }
+
+  @if $font-weight {
+	font-weight: $font-weight;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin word-break
+//
+// zalomeni dlouhych slov a hypheny
+//
+//      layout │ hyphens
+//  _______________
+// │Firefox│_✓_│_✓_│
+// │Chrome │_✓_│_x_│
+// │IE 11  │_✓_│_?_│
+// │EDGE   │_x_│_?_│
+// │Opera  │_✓_│_x_│
+// │Safari │_✓_│_✓_│
+//
+// V EDGE je layout v pořádku do délky slova na 4 řádky. Delší rozbíjí layout dané sekce. MS vkládá hyphens jen někde.
+//
+// @author:		ara
+// @date:		17.03.3026
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin word-break {
+  overflow-wrap: break-word;
+  word-wrap: break-word; //nektere prohlizece vyzaduji pro funkcnost misto overflow-wrap
+  word-break: break-word; //neoficialni reseni pro webkit, chova se jako word-wrap:break-word ale pro dynamickou sirku
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin typo-column
+//
+// @author:		jbe
+// @date:		02.08.2016
+// @version:	1.0
+//
+//
+// Generování zuzeni textu na základe zarovnání
+// Pro určení šířky se používá mapa $wtf-column-width
+// $align: jak ma byt text zarovnan
+//
+// 	- left: text je zarovnán doleva a zužován je z levé strany
+//
+//	- right: text je zarovnán doprava a zužován je z pravé strany
+//
+//	- center: text je zarovnán na střed a zužován z obou stran
+//
+//	- justefy: text je roztažen na celou šířku a zužován z obou stran
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin typo-column($align: left, $selectors: true, $blog-style: false, $list-style: false) {
+  @if $align {
+	// Generovani bez selectoru pro inline styly
+	@if ($wtf-old-typo-selectors == true) {
+	  &:not([style*="text-align"]):not(.wnd-align-right):not(.wnd-align-left):not(.wnd-align-center):not(.wnd-align-justify) {
+
+		@if ($align == left) {
+		  margin-right: 0 !important;
+		}
+
+		@if ($align == right) {
+		  margin-left: 0 !important;
+		}
+
+		@if ($align == center OR $align == justify) {
+		  margin-left: inherit !important;
+		  margin-right: inherit !important;
+		}
+
+	  }
+	} @else {
+	  &:not(.wnd-align-right):not(.wnd-align-left):not(.wnd-align-center):not(.wnd-align-justify) {
+
+		@if ($align == left) {
+		  margin-right: 0 !important;
+		}
+
+		@if ($align == right) {
+		  margin-left: 0 !important;
+		}
+
+		@if ($align == center OR $align == justify) {
+		  margin-left: inherit !important;
+		  margin-right: inherit !important;
+		}
+
+	  }
+	}
+
+	$only-one-flag: true;
+
+	@each $mq, $width in $wtf-column-width {
+
+	  @if $only-one-flag == true {
+		// Vynulovani odsazeni pro zobrazeni ve sloupci nebo mikro sablone
+		@if ($align == left) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-right: 0;
+		  }
+		}
+
+		@if ($align == right) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-left: 0;
+		  }
+		}
+
+		@if ($align == center) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-left: 0;
+			padding-right: 0;
+		  }
+		}
+
+		@if ($align == justify) {
+		  .column-wrapper &,
+		  .mt & {
+			padding-left: 0;
+			padding-right: 0;
+		  }
+		}
+
+		$only-one-flag: false;
+	  }
+
+	  @include mq($mq) {
+		$space: 0;
+		@if $blog-style == false {
+		  $space: 100% - $width;
+		}
+
+		@if ($align == left) {
+		  padding-right: $space;
+		  @if $list-style == false {
+			padding-left: 0;
+		  }
+		}
+
+		@if ($align == right) {
+		  padding-left: $space;
+		  @if $list-style == false {
+			padding-right: 0;
+		  }
+		}
+
+		@if ($align == center) {
+		  padding-left: $space / 2;
+		  padding-right: $space / 2;
+		}
+
+		@if ($align == justify) {
+		  @if $list-style == false {
+			padding-left: $space / 2;
+			padding-right: $space / 2;
+		  }
+		  @else {
+			padding-right: $space;
+		  }
+		}
+
+	  }
+	}
+
+  }
+
+  @if $selectors {
+	// Generovani vcetne selectoru pro inline styly
+
+	@if ($wtf-old-typo-selectors == true) {
+	  &[style*="text-align: left"],
+	  &[style*="text-align:left"],
+	  &.wnd-align-left {
+		margin-right: 0 !important;
+	  }
+	} @else {
+	  &.wnd-align-left {
+		margin-right: 0 !important;
+	  }
+	}
+
+	@if ($wtf-old-typo-selectors == true) {
+	  &[style*="text-align: right"],
+	  &[style*="text-align:right"],
+	  &.wnd-align-right {
+		margin-left: 0 !important;
+	  }
+	} @else {
+	  &.wnd-align-right {
+		margin-left: 0 !important;
+	  }
+	}
+
+	$only-one-flag: true;
+
+	@each $mq, $width in $wtf-column-width {
+
+	  @if $only-one-flag == true {
+		// Vynulovani odsazeni pro zobrazeni ve sloupci nebo mikro sablone
+
+		// text-align: left
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: left"],
+		  &[style*="text-align:left"],
+		  &.wnd-align-left {
+			.column-wrapper &,
+			.mt & {
+			  padding-right: 0;
+			  padding-left: 0;
+			}
+		  }
+		} @else {
+		  &.wnd-align-left {
+			.column-wrapper &,
+			.mt & {
+			  padding-right: 0;
+			  padding-left: 0;
+			}
+		  }
+		}
+
+		// text-align: right
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: right"],
+		  &[style*="text-align:right"],
+		  &.wnd-align-right {
+			.column-wrapper &,
+			.mt & {
+			  padding-right: 0;
+			  padding-left: 0;
+			}
+		  }
+		} @else {
+		  &.wnd-align-right {
+			.column-wrapper &,
+			.mt & {
+			  padding-right: 0;
+			  padding-left: 0;
+			}
+		  }
+		}
+
+		// text-align: center
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: center"],
+		  &[style*="text-align:center"],
+		  &.wnd-align-center {
+			.column-wrapper &,
+			.mt & {
+			  padding-right: 0;
+			  padding-left: 0;
+			}
+		  }
+		} @else {
+		  &.wnd-align-center {
+			.column-wrapper &,
+			.mt & {
+			  padding-right: 0;
+			  padding-left: 0;
+			}
+		  }
+		}
+
+		// text-align: justify
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: justify"],
+		  &[style*="text-align:justify"],
+		  &.wnd-align-justify {
+			.column-wrapper &,
+			.mt & {
+			  padding-left: 0;
+			  padding-right: 0;
+			}
+		  }
+		} @else {
+		  &.wnd-align-justify {
+			.column-wrapper &,
+			.mt & {
+			  padding-left: 0;
+			  padding-right: 0;
+			}
+		  }
+		}
+
+		$only-one-flag: false;
+	  }
+
+	  @include mq($mq) {
+		$space: 0;
+		@if $blog-style == false {
+		  $space: 100% - $width;
+		}
+
+		// text-align: left
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: left"],
+		  &[style*="text-align:left"],
+		  &.wnd-align-left {
+			padding-right: $space;
+			padding-left: 0;
+		  }
+		} @else {
+		  &.wnd-align-left {
+			padding-right: $space;
+			padding-left: 0;
+		  }
+		}
+
+		// text-align: right
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: right"],
+		  &[style*="text-align:right"],
+		  &.wnd-align-right {
+			padding-left: $space;
+			padding-right: 0;
+		  }
+		} @else {
+		  &.wnd-align-right {
+			padding-left: $space;
+			padding-right: 0;
+		  }
+		}
+
+		// text-align: center
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: center"],
+		  &[style*="text-align:center"],
+		  &.wnd-align-center {
+			padding-left: $space / 2;
+			padding-right: $space / 2;
+		  }
+		} @else {
+		  &.wnd-align-center {
+			padding-left: $space / 2;
+			padding-right: $space / 2;
+		  }
+		}
+
+		// text-align: justify
+		@if ($wtf-old-typo-selectors == true) {
+		  &[style*="text-align: justify"],
+		  &[style*="text-align:justify"],
+		  &.wnd-align-justify {
+			@if $list-style == false {
+			  padding-left: $space / 2;
+			  padding-right: $space / 2;
+			}
+			@else {
+			  padding-right: $space;
+			}
+		  }
+		} @else {
+		  &.wnd-align-justify {
+			@if $list-style == false {
+			  padding-left: $space / 2;
+			  padding-right: $space / 2;
+			}
+			@else {
+			  padding-right: $space;
+			}
+		  }
+		}
+
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin blockquote-lang
+//
+// @author:		pan
+// @date:		26.09.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin blockquote-lang($blockquote-lang-map) {
+
+  $lang-list: ();
+
+  // pruchod top-levelem mapy
+
+  @each $lang-item in $blockquote-lang-map {
+
+	$language: nth($lang-item, 1);
+	$lang-data: nth($lang-item, 2);
+
+	// inicializace selektor pole
+
+	$selector: ();
+	$skip-flag: false;
+
+	// pokud je mapa u soucasne iterovaneho jazyka jednourovnova, musime zjistit, zda nejde o "stackovaci definici" (skip: true)
+
+	@if map-depth($lang-data) == 1 {
+
+	  @each $lang-data-item in $lang-data {
+
+		// pokud zjistime skip flag, zapise se jazyk do pole jazyku, ktere bude vyplivnuto pro prvni nasledujici uplnou definici
+
+		@if nth($lang-data-item, 1) == "skip" {
+
+		  $lang-list: append($lang-list, $language);
+		  $skip-flag: true; // nastaveni skip flagu, aby byl zbytek kodu v loopu ignorovan (zaridi nasledujici if)
+
+		}
+	  }
+
+	  @if $skip-flag == false {
+		$lang-list: append($lang-list, $language);
+	  }
+
+	}@else{
+
+	  $lang-list: append($lang-list, $language);
+
+	}
+
+	// pokud jsme u plne definice...
+
+	@if $skip-flag == false {
+
+	  // konstrukce selektoru
+
+	  @if length($lang-list) == 1 {
+
+		$selector: unquote('html[lang="#{$language}"] &');
+
+	  }@else{
+
+		@each $item in $lang-list {
+
+		  $selector: $selector unquote('html[lang="#{$item}"] &');
+
+		  @if $item != nth($lang-list, length($lang-list)) {
+			$selector: $selector unquote(',');
+		  }
+
+		}
+
+	  }
+
+	  // vypsani selektoru, dalsi logika nasleduje uvnitr
+
+	  #{$selector}{
+		//blockquote:before {
+
+		// check, zda je mapa jednourovnova (a nebude potreba resit breakpointy)
+
+		@if map-depth($lang-data) == 1 {
+
+		  @include blockquote-lang-css($lang-data);
+
+
+		  // pokud ma vice urovni, zpracuji se breakpointy
+
+		}@else{
+
+		  @each $lang-data-item in $lang-data {
+
+			$breakpoint: nth($lang-data-item, 1);
+			$lang-data-block: nth($lang-data-item, 2);
+
+			@if ($breakpoint == 0) {
+
+			  @include blockquote-lang-css($lang-data-block);
+
+			}@else{
+
+			  @include mq($breakpoint) {
+
+				@include blockquote-lang-css($lang-data-block);
+
+			  }
+			}
+		  }
+		}
+		//}
+	  }
+
+	  $lang-list: ();
+
+	}
+  }
+}
+
+@mixin blockquote-lang-css($css-map){
+
+  @each $item in $css-map {
+
+	$rule-name: nth($item, 1);
+	$rule-value: nth($item, 2);
+
+	@if $rule-name == "font-family" and $rule-value != "serif" and $rule-value != "sans-serif" {
+	  @include font-family($rule-value);
+	} @else if $rule-name == 'transform' {
+	  @include transform($rule-value);
+	} @else {
+	  #{$rule-name}: #{$rule-value};
+	}
+
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin bg-color
+//
+// barva pozadi s automatickym fallbackem pro RGBa
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin bg-color($color-set, $map: false, $set-alpha: false, $important: false) {
+  $color: false;
+  $ready: false;
+  $imp: '';
+
+  @if $important {
+	$imp: ' !important';
+  }
+
+  // nacitani z mapy barev
+  @if $map {
+	$color: get-map-value($map, $color-set);
+  } @else { // barva je zadana primo
+	$color: $color-set;
+  }
+
+  @if $color {
+	@if $color != none {
+
+	  @if $set-alpha {
+		$color: change_color($color, $alpha: $set-alpha);
+	  }
+
+	  $alpha: alpha($color);
+
+	  @if $alpha < 1 {
+		@if $wtf-ie8-support {
+		  $color-rgb: change_color($color, $alpha: 1);
+		  background-color: $color-rgb#{$imp};
+		}
+		background-color: $color#{$imp};
+
+		@if $wtf-ie8-support {
+		  $color-ie: ie-hex-str($color);
+		  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$color-ie}', endColorstr='#{$color-ie}', GradientType=0)#{$imp};
+		  ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$color-ie}', endColorstr='#{$color-ie}', GradientType=0)#{$imp};
+		}
+	  } @else {
+		background-color: $color#{$imp};
+	  }
+	}
+	@else {
+	  background-color: transparent;
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin text-color
+//
+// barva textu s automatickym fallbackem pro RGBa
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin text-color($color-set, $map: false, $set-alpha: false, $important: false) {
+  $color: false;
+  $ready: false;
+  $imp: '';
+
+  @if $important {
+	$imp: ' !important';
+  }
+
+  // nacitani z mapy barev
+  @if $map {
+	$color: get-map-value($map, $color-set);
+	$ready: true;
+  }
+
+	// barva je zadana primo
+  @else {
+	$color: $color-set;
+	$ready: true;
+  }
+
+
+  @if $color {
+	@if $set-alpha {
+	  $color: change_color($color, $alpha: $set-alpha);
+	}
+
+	$alpha: alpha($color);
+
+	@if $alpha < 1 {
+	  @if $wtf-ie8-support {
+		$color-rgb: change_color($color, $alpha: 1);
+		color: $color-rgb#{$imp};
+	  }
+	  color: $color#{$imp};
+	}
+	@else {
+	  color: $color#{$imp};
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin text-shadow
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $position
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin text-shadow($color-set, $position: false, $map: false, $set-alpha: false, $important: false) {
+  $color: false;
+  $ready: false;
+  $imp: '';
+
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @if $color-set == none {
+	text-shadow: none#{$imp};
+  } @else {
+	@if $map {
+	  $color: get-map-value($map, $color-set);
+	} @else {
+	  $color: $color-set;
+	}
+
+	@if $color == none {
+	  text-shadow: none#{$imp};
+	}
+	@elseif $color {
+	  @if $set-alpha {
+		$color: change_color($color, $set-alpha);
+	  }
+
+	  $alpha: alpha($color);
+
+	  @if $alpha < 1 {
+		@if $wtf-ie8-support {
+		  $color-rgb: change_color($color, $alpha: 1);
+		  text-shadow: $position $color-rgb#{$imp};
+		}
+		text-shadow: $position $color#{$imp};
+	  } @else {
+		text-shadow: $position $color#{$imp};
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin linear-gradient
+//
+// $color-from:		HEX, id promene v SASS mape
+// $color-to:		HEX, id promene v SASS mape
+// $map:			false, nazev SASS mapy
+// $type:			false, left-right, right-left
+//
+// @author:		jbe
+// @date:		12.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin linear-gradient($color-from, $color-to, $map: false, $type: false) {
+  @if $map {
+	$color-from: get-map-value($map, $color-from);
+	$color-to: get-map-value($map, $color-to);
+  }
+
+  @if $color-from and $color-to {
+	$ie-from: ie-hex-str($color-from);
+	$ie-to: ie-hex-str($color-to);
+
+	$webkit: 'left top, left bottom';
+	$spec: '';
+	$ie: 0;
+
+	@if $type == left-right {
+	  $webkit: 'left top, right bottom';
+	  $spec: '135deg,';
+	  $ie: 1;
+	}
+
+	@if $type == right-left {
+	  $webkit: 'left bottom, right top';
+	  $spec: '45deg,';
+	  $ie: 1;
+	}
+
+	background-image: -webkit-gradient(linear, #{$webkit}, from($color-from), to($color-to));
+	background-image: -webkit-linear-gradient(#{$spec} $color-from, $color-to);
+	background-image: linear-gradient(#{$spec} $color-from, $color-to);
+	-ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$ie-from}', endColorstr='#{$ie-to}', GradientType=#{$ie});
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin border
+//
+// $border		- sirka cary [px, none, false], [top right bottom left]
+// $style		- styl cary [solid, dotted, dashed, none]
+// $color		- barva v formatu HEX, prevod na rgb se provadi automaticky
+//
+// @author:		jbe
+// @date:		25.03.2015
+// @version:	1.1
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin border($border: 1px, $style: solid, $color-set: false, $map: false, $important: false, $set-alpha: false) {
+  $imp: '';
+  $color: '';
+
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @if $border == none {
+	border: none#{$imp};
+  }
+  @else {
+
+	@if $map {
+	  $color: get-map-value($map, $color-set);
+	} @else {
+	  $color: $color-set;
+	}
+
+	@if $color {
+	  @if $set-alpha {
+		$color: change_color($color, $alpha: $set-alpha);
+	  }
+
+	  @if length($border) == 1 {
+		border: $border $style $color#{$imp};
+	  }
+
+	  @if length($border) == 2 {
+		$top-bottom: nth($border, 1);
+		$right-left: nth($border, 2);
+
+		@if $top-bottom {
+		  border-top: $top-bottom $style $color#{$imp};
+		  border-bottom: $top-bottom $style $color#{$imp};
+		}
+		@if $right-left {
+		  border-right: $right-left $style $color#{$imp};
+		  border-left: $right-left $style $color#{$imp};
+		}
+	  }
+
+	  @if length($border) == 3 {
+		$top: nth($border, 1);
+		$right-left: nth($border, 2);
+		$bottom: nth($border, 3);
+
+		@if $top {
+		  border-top: $top $style $color#{$imp};
+		}
+		@if $right-left {
+		  border-right: $right-left $style $color#{$imp};
+		  border-left: $right-left $style $color#{$imp};
+		}
+		@if $bottom {
+		  border-bottom: $bottom $style $color#{$imp};
+		}
+	  }
+
+	  @if length($border) == 4 {
+		$top: nth($border, 1);
+		$right: nth($border, 2);
+		$bottom: nth($border, 3);
+		$left: nth($border, 4);
+
+		@if $top {
+		  border-top: $top $style $color#{$imp};
+		}
+		@if $right {
+		  border-right: $right $style $color#{$imp};
+		}
+		@if $bottom {
+		  border-bottom: $bottom $style $color#{$imp};
+		}
+		@if $left {
+		  border-left: $left $style $color#{$imp};
+		}
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin opacity
+//
+// auto fallback for opacity
+//
+// $value:		0 - 1
+//
+// @author:		jbe
+// @date:		12.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin opacity($value, $important: false) {
+  $imp: '';
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @if $value {
+	@if $wtf-ie8-support {
+	  $filter: $value * 100;
+	  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$filter})"#{$imp};
+	}
+	opacity: $value#{$imp};
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin selection
+//
+// @author:		jbe
+// @date:		12.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin selection($bg, $alpha) {
+  ::-moz-selection {
+	@include bg-color($color-set: $bg, $set-alpha: $alpha);
+  }
+
+  ::selection {
+	@include bg-color($color-set: $bg, $set-alpha: $alpha);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin filter
+//
+// auto fallback for filter
+//
+// $value:		0 - 1
+//
+// @author:		jbe
+// @date:		12.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin filter($value...) {
+  @if $value {
+	@include prefixer(filter, $value);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin box-shadow
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $shadow		- nastaveni pozice a rozmazani stinu
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jbe
+// @date:		04.05.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin box-shadow($shadow, $color-set, $map: false, $set-alpha: false, $important: false, $shadow2: false, $color-set2: false) {
+  $color: false;
+  $color2: false;
+  $alpha2: 1;
+  $ready: false;
+  $imp: '';
+
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @if $color-set == none {
+	box-shadow: none#{$imp};
+  } @else {
+	@if $map {
+	  $color: get-map-value($map, $color-set);
+
+	  @if $color-set2 {
+		$color2: get-map-value($map, $color-set2);
+	  }
+	} @else {
+	  $color: $color-set;
+
+	  @if $color-set2 {
+		$color2: $color-set2;
+	  }
+	}
+
+	@if $color {
+	  @if $set-alpha {
+		$color: change_color($color, $alpha: $set-alpha);
+
+		@if $color-set2 {
+		  $color2: change_color($color2, $alpha: $set-alpha);
+		}
+	  }
+
+	  $alpha: alpha($color);
+
+	  @if $color-set2 {
+		$alpha2: alpha($color2);
+	  }
+
+
+
+	  @if $wtf-ie8-support {
+
+		@if $shadow2 {
+		  @if ( $alpha < 1 or $alpha2 < 1 ) {
+			$color-rgb: change_color($color, $alpha: 1);
+			$color-rgb2: change_color($color2, $alpha2: 1);
+
+			box-shadow: $shadow $color-rgb, $shadow2 $color-rgb2;
+		  }
+
+		} @else {
+		  @if $alpha < 1 {
+			$color-rgb: change_color($color, $alpha: 1);
+			box-shadow: $shadow $color-rgb;
+		  }
+		}
+	  }
+
+
+	  @if $shadow2 {
+		box-shadow: $shadow $color, $shadow2 $color2;
+	  } @else {
+		box-shadow: $shadow $color;
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin claim-shadow pro manipulaci box-shadow v claimech. Mixin box-shadow zustava obecnym mix. pro libovolne pouziti
+//
+// $color-set	- barva v HEX nebo identifikator v SASS mape
+// $shadow		- nastaveni pozice a rozmazani stinu
+// $map			- promenna obsahujici SASS mapu s barvami
+// $set-alpha	- nastaveni alpha kanalu barvy
+// $important	- pokud je true, vygeneruje se !important
+//
+// @author:		jma
+// @date:		24.09.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin claim-shadow($shadow, $color-set, $map: false, $set-alpha: false, $important: false, $shadow2: false, $color-set2: false) {
+
+  $color: false;
+  $color2: false;
+  $alpha2: 1;
+  $imp: '';
+
+  @if $important {
+	$imp: ' !important';
+  }
+
+  @if $color-set == none {
+	box-shadow: none#{$imp};
+  } @else {
+	@if $map {
+	  $color: get-map-value($map, $color-set);
+
+	  @if $color-set2 {
+		$color2: get-map-value($map, $color-set2);
+	  }
+	} @else {
+	  $color: $color-set;
+
+	  @if $color-set2 {
+		$color2: $color-set2;
+	  }
+	}
+
+	@if $color {
+	  @if $set-alpha {
+
+		$color: change_color($color, $alpha: $set-alpha);
+
+
+		@if $color-set2 {
+		  $color2: change_color($color2, $alpha: $set-alpha);
+		}
+	  }
+
+	  $alpha: alpha($color);
+
+	  @if $color-set2 {
+		$alpha2: alpha($color2);
+	  }
+
+	  @if ( $alpha < 1 or $alpha2 < 1 ) {
+		// if using alpha colors, we can put only one box shadow layer so IE bug can not be eliminated in this case
+		@include box-shadow($shadow, $color-set, $map, $set-alpha, $important, $shadow2, $color-set2);
+	  }
+	  @else {
+		// if using solid colors, we put more box shadows to eliminate IE antialiasing bug - transparent vertical line
+
+		@if $shadow2 {
+		  box-shadow: $shadow $color, $shadow2 $color2, $shadow $color, $shadow2 $color2, $shadow $color, $shadow2 $color2;
+		} @else {
+		  box-shadow: $shadow $color, $shadow $color, $shadow $color;
+		}
+
+	  }
+
+	}
+  }
+  @include border-radius(0.1px);
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin embed-color
+//
+// barva embedu
+//
+// $color-set	- identifikator v SASS mape
+// $map			- promenna obsahujici SASS mapu s barvami
+// @author:		jma
+// @date:		16.09.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin embed-color($color-set, $map:false) {
+
+  $alpha: 1;
+  $opaque: false;
+  $foreground-configured-icon-embed-color: false;
+
+  //$foreground-section-color: get-map-value($wtf-section-color, section-text);
+
+  // Default styling i.e. no need to be embed color defined in config.
+  // But default state must be styled to avoid transfering section color with alpha to svg javascript.
+  // Before using this solution CMS had js error due to passing aplha color to svg javascript.
+
+  //@if $foreground-section-color {
+  //  $alpha: alpha($foreground-section-color);
+  //  $opaque: opacify($foreground-section-color, 1);
+  //}
+
+  @if $map {
+	$foreground-configured-icon-embed-color: get-map-value($map, $color-set);
+
+	@if $foreground-configured-icon-embed-color == false {
+	  $foreground-configured-icon-embed-color: get-map-value($wtf-section-color, section-text);
+	}
+  }
+  @else {
+	$foreground-configured-icon-embed-color: $color-set;
+  }
+
+  // For some section color there exists special color configured for embed in common content so we overwrite default styling
+
+  @if $foreground-configured-icon-embed-color {
+	$alpha: alpha($foreground-configured-icon-embed-color);
+	$opaque: opacify($foreground-configured-icon-embed-color, 1);
+  }
+
+  @if $opaque {
+	color: $opaque;
+	// Write opacity even if alpha = 1 for overwriting possible default partial opacity
+	@include opacity($alpha);
+  }
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin placeholder
+//
+// nastavitelne vlastnosti:
+//	- color
+//	- font-size
+//	- font-style
+//	- font-weight
+//	- letter-spacing
+//	- line-height
+//	- padding
+//	- text-align
+//	- text-decoration
+//
+// @author:		jbe
+// @date:		11.01.2015
+// @version:	1.0
+//
+// @source: http://blog.teamtreehouse.com/the-css3-placeholder-pseudo-element
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin placeholder() {
+  &::-webkit-input-placeholder {
+	@content;
+  }
+
+  &:-moz-placeholder {
+	@content;
+  }
+
+  &::-moz-placeholder {
+	@content;
+  }
+
+  &:-ms-input-placeholder {
+	@content;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin display
+//
+// @author:		jbe
+// @date:		18.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin display($value) {
+  @if $value == flex {
+	display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+	display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+	display: -ms-flexbox;      /* TWEENER - IE 10 */
+	display: -webkit-flex;    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+	display: flex;
+
+  } @else {
+	display: $value;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin flex
+//
+// @author:		jbe
+// @date:		18.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin flex($value) {
+  @if nth($value, 1) == none {
+	-webkit-box-flex: 0;
+  } @else {
+	-webkit-box-flex: nth($value, 1);
+  }
+  -moz-box-flex: $value;
+  -webkit-flex: $value;
+  -ms-flex: $value;
+  flex: $value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin flex-direction
+//
+// @author:		jbe
+// @date:		18.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin flex-direction($value) {
+  @if $value == column {
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+  }
+
+  @if $value == column-reverse {
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: reverse;
+	-webkit-flex-direction: column-reverse;
+	-ms-flex-direction: column-reverse;
+	flex-direction: column-reverse;
+  }
+
+  @if $value == row {
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	-ms-flex-direction: row;
+	flex-direction: row;
+  }
+
+  @if $value == row-reverse {
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: reverse;
+	-webkit-flex-direction: row-reverse;
+	-ms-flex-direction: row-reverse;
+	flex-direction: row-reverse;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin order
+//
+// @author:		jbe
+// @date:		18.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin order($value) {
+  -webkit-box-ordinal-group: $value;
+  -moz-box-ordinal-group: $value;
+  -ms-flex-order: $value;
+  -webkit-order: $value;
+  order: $value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin justify-content
+//
+// @author:		jbe
+// @date:		29.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin justify-content($value) {
+  //-webkit-box-pack: $value;
+  -webkit-justify-content: $value;
+  -ms-flex-pack: $value;
+  -ms-justify-content: $value;
+  justify-content: $value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin align-items
+//
+// @author:		jbe
+// @date:		03.05.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin align-items($value) {
+  -webkit-box-align: $value;
+  -webkit-align-items: $value;
+  -ms-flex-align: $value;
+  align-items: $value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin flex-shrink
+//
+// @author:		jbe
+// @date:		18.04.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin flex-shrink($value) {
+  -webkit-flex-shrink: $value;
+  flex-shrink: $value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin flex-wrap
+//
+// @author:		jma
+// @date:		28.06.2016
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin flex-wrap($value) {
+  -webkit-flex-wrap: $value;
+  flex-wrap: $value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// New Claim Size Mixins 2.0
+//
+//
+// @author:		pan
+// @date:		11.01.2015
+// @version:	2.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+// mixin, ktery z dodane mapy vytvori pravidla pro defaultni 100% velikosti rodicovskeho elementu claimu
+
+
+@mixin claim-default-size($size-map){
+
+  @each $size-data in $size-map {
+
+	$breakpoint: nth($size-data, 1);
+	$font-size: nth($size-data, 2);
+
+	@if $breakpoint == 0 {
+	  @include font-size($font-size);
+	}@else{
+	  @include mq($breakpoint) {
+		@include font-size($font-size);
+	  }
+	}
+  }
+}
+
+// mixin díky kterému je možné zadat větší/menší velikost pro vybraný font
+
+@mixin font-size-correction($correction-map){
+
+  @each $font-data in $correction-map {
+
+	$font-name: nth($font-data, 1);
+	$font-size: nth($font-data, 2);
+
+	&.#{$font-name} {
+	  font-size: $font-size;
+	}
+  }
+}
+
+//
+
+@mixin make-line-heights-map($line-heights-map){
+
+  @each $font-data in $line-heights-map {
+
+	// media-query based 1level map
+	@if type-of(nth($font-data, 1)) == number {
+
+	  $breakpoint: nth($font-data, 1);
+	  $font-line-height: nth($font-data, 2);
+
+	  @if (nth($font-data, 1) == 0) {
+		> span {
+		  line-height: $font-line-height;
+		}
+	  }@else{
+		@include mq($breakpoint) {
+		  > span {
+			line-height: $font-line-height;
+		  }
+		}
+	  }
+
+	  // font-name based 1level map
+	}@else {
+
+	  $font-name: nth($font-data, 1);
+	  $font-line-height: nth($font-data, 2);
+
+	  &.#{$font-name} > span {
+		line-height: $font-line-height;
+	  }
+
+	}
+  }
+}
+
+@mixin line-heights($line-heights-map){
+
+  @if type-of($line-heights-map) == number or type-of($line-heights-map) == string {
+
+	> span {
+	  line-height: $line-heights-map;
+	}
+
+  }@else{
+	@if map-depth($line-heights-map) == 1 {
+
+	  @include make-line-heights-map($line-heights-map);
+
+
+	}@else{
+
+	  @each $data, $map in $line-heights-map {
+
+		@if (nth($data, 1) == 0) {
+
+		  @include make-line-heights-map($map);
+
+		} @else {
+
+		  @include mq(nth($data, 1)) {
+			@include make-line-heights-map($map);
+		  }
+		}
+	  }
+	}
+  }
+}
+
+// podpurny mixin, ktery pouze ze zadane jednourovnove mapy pouze vytvori soubor pravidel velikosti pro jednotlive stupne zmenseni claimu
+// vyuziva jej font-auto-size()
+
+@mixin make-autosize-map($size-map){
+
+  @each $size-data in $size-map {
+
+	$size-class: nth($size-data, 1);
+	$size-percentage: nth($size-data, 2);
+
+	.wnd-font-size-#{$size-class} > span {
+	  font-size: $size-percentage;
+	}
+  }
+}
+
+// mixin vytvarejici soubor velikosti pro jednotlive stupne zmenseni claimu
+// pokud dostane jednourovnovou mapu, vytvori jen zakladni seznam pravidel velikosti pro fonty
+// pokud dostane viceurovnovou mapu, vytvori responzivni seznam pravidel
+
+@mixin font-auto-size($size-map){
+
+
+  @if map-depth($size-map) == 1 {
+
+	@include make-autosize-map($size-map);
+
+  }@else{
+
+	@each $data, $map in $size-map {
+
+	  @if (nth($data, 1) == 0) {
+
+		@include make-autosize-map($map);
+
+	  } @else {
+
+		@include mq(nth($data, 1)) {
+		  @include make-autosize-map($map);
+		}
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// old versions of the new mixins - DELETE
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+// mixin, ktery vytvori soubor pravidel pro line-height k jednotlivym fontum ze zadane mapy
+
+//@mixin line-heights($line-heights-map){
+//
+//  @each $font-data in $line-heights-map {
+//
+//    $font-name: nth($font-data, 1);
+//    $font-line-height: nth($font-data, 2);
+//
+//    &.#{$font-name} {
+//      line-height: $font-line-height;
+//    }
+//  }
+//}
+//
+//@mixin line-heights-2($line-heights-map){
+//
+//  @each $font-data in $line-heights-map {
+//
+//    $font-name: nth($font-data, 1);
+//    $font-line-height: nth($font-data, 2);
+//
+//    &.#{$font-name} > span {
+//      line-height: $font-line-height;
+//    }
+//  }
+//}
+
+// mixin, ktery vytvori soubor pravidel velikosti pro jednotlive stupne zmenseni claimu
+
+//@mixin font-auto-size($size-map){
+//
+//  @each $size-data in $size-map {
+//
+//    $size-class: nth($size-data, 1);
+//    $size-percentage: nth($size-data, 2);
+//
+//    .wnd-font-size-#{$size-class} {
+//      font-size: $size-percentage;
+//    }
+//  }
+//}
+//
+//@mixin font-auto-size-2($size-map){
+//
+//  @each $size-data in $size-map {
+//
+//    $size-class: nth($size-data, 1);
+//    $size-percentage: nth($size-data, 2);
+//
+//    .wnd-font-size-#{$size-class} > span {
+//      font-size: $size-percentage;
+//    }
+//  }
+//}
+
+
+///////////////
+///////////////
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// claim-size mixins - old version - DEPRECATED
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+// mixin pro vytvoreni "mapy" velikosti claimovych fontu podle zadane sass mapy
+// kandidat na optimalizaci, spousta kodu se opakuje a neco uz je ted i mozna zbytecne
+
+@mixin font-size-map($data, $map){
+
+  @each $size in $map {
+
+	$class-no: nth($size, 1);
+	$font-sizes: nth($size, 2);
+
+	$class-no-pair: $class-no - 10;
+
+	@if length($font-sizes) != 2 {
+	  @warn "claim-size has bad argument count";
+	}
+
+	@if $class-no == 100 {
+
+	  @include font(nth($font-sizes,1), nth($font-sizes,2));
+
+	  &.wnd-font-size-#{$class-no-pair} {
+		@include font(nth($font-sizes,1), nth($font-sizes,2));
+	  }
+
+	}@else{
+
+	  &.wnd-font-size-#{$class-no}, &.wnd-font-size-#{$class-no-pair} {
+		@include font(nth($font-sizes,1), nth($font-sizes,2));
+	  }
+	}
+  }
+}
+
+@mixin claim-size($font-size-map) {
+
+  @each $data, $map in $font-size-map {
+
+	@if (nth($data, 1) == 0) {
+
+	  @include font-size-map($data, $map);
+
+	} @else {
+
+	  @include mq(nth($data, 1)) {
+		@include font-size-map($data, $map);
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// @mixin mobile-menu, @mixin mobile-menu-pos, @mixin layout slide
+//
+//
+// @author:		pan
+// @date:		11.01.2015
+// @version:	1.0
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  @mixin mobile-menu-pos
+//
+//  Mixin slouzi ke vlastni konstrukci stylu pro mobilni menu dle promennych v configu
+//	Urcuje odkud bude menu vyjizdet a zda bude telo stranky slidovat spolu s menu
+//	Je volan mixinem "mobile-menu"
+//	Pouziva se v definici stylu mobilniho menu
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
+@mixin mobile-menu-pos($pos, $width){
+
+  // MENU SLIDING FROM TOP  ////////////////////////////////////////////////////////////////////////////////////////////
+
+  @if $pos == top  {
+
+	@include transform(translate3d(0, -100%, 0));
+	@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	}@else{
+
+	  width: $width;
+	  left: auto;
+	  right: 0;
+	}
+
+	&.open {
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  display: block;
+	}
+
+	// MENU SLIDING FROM BOTTOM  ///////////////////////////////////////////////////////////////////////////////////////
+
+  }@else if $pos == bottom {
+
+	@include transform(translate3d(0, 100%, 0));
+	@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	}@else{
+
+	  left: auto;
+	  right: 0;
+	  width: $width;
+	}
+
+	&.open {
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  display: block;
+	}
+
+	// MENU SLIDING FROM LEFT ////////////////////////////////////////////////////////////////////////////////////////////
+
+  }@else if $pos == left {
+
+	@if $width == 100% {
+
+	  @include transform(translate3d(-100%, 0, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	  width: 100%;
+	  left: 0;
+	  right: 0;
+
+	  &.open {
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+		display: block;
+	  }
+
+	}@else{
+
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(left 200ms ease-in, box-shadow 200ms ease-in);
+
+	  left: ($width * -1);
+	  width: $width;
+
+	  &.open {
+		@include transition(left 200ms ease-in, box-shadow 200ms ease-in);
+		left: 0;
+	  }
+	}
+
+	// MENU SLIDING FROM RIGHT /////////////////////////////////////////////////////////////////////////////////////////
+
+  } @else if $pos == right {
+
+	@if $width == 100% {
+
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  @include transform(translate3d(100%, 0, 0));
+
+	  width: 100%;
+	  left: 0;
+	  right: 0;
+
+	  &.open {
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+		display: block;
+	  }
+
+	} @else {
+
+	  // BODY SLIDING WITH MENU ////////////////////////////////////////////////////////////////////////////////////////
+
+	  @if $slide-body == false {
+
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(right 200ms ease-in, box-shadow 200ms ease-in);
+
+		right: ($width * -1);
+		width: $width;
+		left: auto;
+		top: 0;
+
+		&.open {
+		  @include transition(right 200ms ease-in, box-shadow 200ms ease-in);
+		  right: 0;
+		  display: block;
+		}
+
+		// BODY NOT SLIDING WITH MENU ////////////////////////////////////////////////////////////////////////////////////
+
+	  } @else {
+
+		@include transform(translate3d(0%, 0%, 0));
+		@include transition(transform 200ms ease-in);
+
+		right: ($width * -1);
+		width: $width;
+		left: auto;
+		top: 0;
+
+		&.open {
+		  @include transform(translate3d(-100%, 0%, 0));
+		  @include transition(transform 200ms ease-in);
+		}
+	  }
+	}
+
+	// MENU FADES IN FROM CENTER ///////////////////////////////////////////////////////////////////////////////////////
+
+  } @else if $pos == center {
+
+	display: none;
+	@include opacity(0);
+	@include transition(opacity 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	} @else {
+
+	  width: $width;
+	  left: auto;
+	  right: 0;
+
+	}
+
+	&.open {
+
+	  @include opacity(1);
+	  @include transition(opacity 200ms ease-in, box-shadow 200ms ease-in);
+
+	}
+
+	// DEFAULT VALUE (TOP) /////////////////////////////////////////////////////////////////////////////////////////////
+
+  } @else {
+
+	@include transform(translate3d(0, -100%, 0));
+	@include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+
+	@if $width == 100% {
+
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+
+	} @else {
+
+	  width: $width;
+	  left: auto;
+	  right: 0;
+
+	}
+
+	&.open {
+	  @include transform(translate3d(0%, 0%, 0));
+	  @include transition(transform 200ms ease-in, box-shadow 200ms ease-in);
+	  display: block;
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  @mixin mobile-menu
+//
+//  Matersky mixin pro konstrukci responzivnich stylu pro mobilni menu
+//  Vola si na pomoc mixin "mobile-menu-pos"
+//	Pouziva se v definici stylu mobilniho menu
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+@mixin mobile-menu($menu-size-map, $menu-position) {
+
+  // pruchod media queries pomoci mapy zadane v settings
+  @each $screen-dimension, $width-value in $menu-size-map {
+
+	// pokud je aktualni hodnota 0px, zapise se vlastnost bez media queries
+	@if (nth($screen-dimension, 1) == 0px) {
+
+	  @include mobile-menu-pos($menu-position, $width-value);
+
+	  // pokud ne, vypise se vlastnost v media query
+	} @else {
+
+	  @include mq(nth($screen-dimension, 1)) {
+
+		// volani mixinu, ktery vytahne potrebne rozmery z mapy
+		@include mobile-menu-pos($menu-position, $width-value);
+
+	  }
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  @mixin layout-slide
+//
+//  Mixin pro konstrukci stylu, ktere umozni telu stranky v pripade potreby slidovat spolu s mobilnim menu
+//  Pouziva se v definici stylu layoutu
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+@mixin layout-slide($menu-size-map) {
+
+  // pruchod media queries pomoci mapy zadane v settings
+  @each $screen-dimension, $width-value in $menu-size-map {
+
+	// pokud je aktualni hodnota 0px, zapise se vlastnost bez media queries
+	@if (nth($screen-dimension, 1) == 0px) {
+
+	  right: $width-value;
+	  @include transition(right 200ms ease-in);
+
+	  // pokud ne, vypise se vlastnost v media query
+	} @else {
+
+	  @include mq(nth($screen-dimension, 1)) {
+
+		right: $width-value;
+		@include transition(right 200ms ease-in);
+
+	  }
+	}
+  }
+}
+
+
+
+// Clearfix
+.cf {
+  @include clearfix;
+}
+
+
+// Hide
+.hide,
+.hidden {
+  display: none !important;
+}
+
+
+.noscroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+
+
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+// Reset HTML
+
+html {
+  width: 100%;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+// Globální box sizing nastavený na výchozí hodnotu border-box
+#wrapper * {
+  @include box-sizing;
+}
+
+
+// Removes iframe border
+
+iframe {
+  border: none;
+}
+
+
+// IE outline fix
+.lt-ie10 {
+  a,
+  a:hover,
+  a:active,
+  a:focus {
+	outline: none !important;
+  }
+}
+
+
+// DFC režim balí některý obsah do var tagů, které byly doposud stylované jako italic
+
+var {
+  font-style: normal;
+}
+
+
+// Vzhled výběru textu
+
+@include selection($wtf-base-selection-color, 0.4);
+
+
+// Stylování odkazů v DFC
+
+a {
+  var {
+	text-decoration: none !important;
+  }
+
+  @include hover {
+	var {
+	  text-decoration: none !important;
+	}
+  }
+}
+
+
+// zarovnani obrazku ---------------------------------------------------------------------------------------------------
+.wnd-float-left,
+.wnd-float-right {
+  position: relative;
+
+  @include mq($max-width: 320px) {
+	min-width: 40%;
+  }
+
+  @include mq($max-width: 480px) {
+	min-width: 30%;
+  }
+
+  + .text {
+	ul,
+	blockquote {
+	  display: table;
+	}
+
+	ol {
+	  display: table-cell;
+	}
+  }
+}
+
+.column-content {
+  .wnd-float-left {
+	left: auto;
+	margin-left: 0 !important;
+  }
+
+  .wnd-float-right {
+	right: auto;
+	margin-right: 0 !important;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+//
+// Zarovnání na mobilních zařízeních
+//
+// ---------------------------------------------------------------------------------------------------------------------
+
+@include mq($max-width: $wtf-text-indent-viewport - 1) {
+  .text,
+  .blog {
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	li {
+	  margin-left: 0 !important;
+	  margin-right: 0 !important;
+	}
+  }
+}
+
+
+@include mq($max-width: $wtf-text-align-viewport - 1) {
+
+  .text,
+  .blog {
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	ul li,
+	ol li {
+	  &[style*="text-align: right;"],
+	  &[style*="text-align:right;"],
+	  &[style*="text-align: right"],
+	  &[style*="text-align:right"],
+	  &.wnd-align-right {
+		text-align: left !important;
+	  }
+	}
+  }
+
+  // oprava zarovnani v micro template, dříve řešena pomocí @extend %mt v jednotlivych mikrosablonach
+  // Všechny micro tempalte jsou označeny class .mt
+
+  .mt {
+	.text,
+	.blog {
+	  p,
+	  h1,
+	  h2,
+	  h3,
+	  h4,
+	  ul li,
+	  ol li {
+		text-align: inherit !important;
+	  }
+	}
+  }
+}
+
+// barvy odkazu v headings, jednotny styl ------------------------------------------------------------------------------
+
+body.wnd-cms {
+  .text,
+  .mt .text {
+	h1,
+	h2,
+	h3,
+	h4 {
+	  a, a:hover  {
+		color: inherit !important;
+		border-bottom-color: rgba(0, 0, 0, 0) !important;
+		text-decoration: none !important;
+	  }
+	}
+	p font[color] {
+	  a, a:hover  {
+		color: inherit !important;
+		border-bottom-color: inherit !important;
+	  }
+	}
+  }
+}
+
+body:not(.wnd-cms) {
+  .text,
+  .mt .text {
+	h1,
+	h2,
+	h3,
+	h4 {
+	  a:not(:hover) {
+		color: inherit !important;
+		border-bottom-color: rgba(0, 0, 0, 0) !important;
+		text-decoration: none !important;
+	  }
+	  a:hover {
+		color: inherit !important;
+		border-bottom-color: inherit !important;
+		font[color] {
+		  @include transition(all 100ms ease-in);
+		  border-bottom: 1px solid currentColor !important;
+		}
+	  }
+	}
+	p font[color] {
+	  a, a:hover {
+		color: inherit !important;
+		border-bottom-color: inherit !important;
+	  }
+	}
+  }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// wsw.scss
+// styly pro WSW editor'
+//
+// version:         1.0
+// date:            18.08.2016
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Zarovnání textu -----------------------------------------------------------------------------------------------------
+.wnd-page {
+  .text {
+	.wnd-align-left {
+	  text-align: left;
+	}
+
+	.wnd-align-center {
+	  text-align: center;
+	}
+
+	.wnd-align-justify {
+	  text-align: justify;
+	}
+
+	.wnd-align-right {
+	  text-align: right;
+	}
+  }
+}
+
+
+// Odsazení textu ------------------------------------------------------------------------------------------------------
+
+@mixin wnd-offset($multiple, $point) {
+
+  @include mq($wtf-text-indent-viewport) {
+
+	@for $i from 1 through 5 {
+
+	  .wnd-offset-#{$i} {
+		$offset: $i * 1em;
+
+		@if $i > $point {
+		  $offset: $offset * $multiple;
+		}
+
+		margin-left: $offset;
+		margin-right: $offset;
+
+		@if ( $wtf-text-offset-old-typo == false ) {
+		  &[style*="text-align: center"],
+		  &[style*="text-align:center"],
+		  &[style*="text-align: justify"],
+		  &[style*="text-align:justify"],
+		  &.wnd-align-center,
+		  &.wnd-align-justify {
+			margin-left: $offset * 0.5;
+			margin-right: $offset * 0.5;
+		  }
+		}
+	  }
+
+	}
+
+  }
+}
+
+.text {
+  @include wnd-offset($wtf-text-offset-multiple, $wtf-text-offset-point);
+}
+
+.mt .text {
+  @include wnd-offset($wtf-mt-text-offset-multiple, $wtf-mt-text-offset-point);
+}
+
+
+// A+/A- pro text ------------------------------------------------------------------------------------------------------
+
+@mixin wnd-font-size() {
+  font {
+	@for $i from 1 through 20 {
+	  $size: $i * 10;
+
+	  &.wnd-font-size-#{$size} {
+		$size: $size * 1%;
+		font-size: $size;
+	  }
+	}
+  }
+}
+
+@include wnd-font-size;
+
+
+// Korekce line height pro pouziti A+/-
+font[class*='wnd-font-size'] {
+  display: inline-block;
+}
+
+// Globální nastavení font weight pro Fallback fonty
+
+.fonts-loaded .wnd-fonts-fallback .wnd-page {
+  font-weight: 400 !important;
+
+  h1,
+  h2,
+  h3,
+  h4 {
+	font-weight: 400 !important;
+  }
+
+  b,
+  strong {
+	font-weight: 700 !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+	b,
+	strong {
+	  font-weight: 700 !important;
+	}
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// section-bg.scss
+//
+// Společné chování section background
+//
+// version:         1.0
+// date:            03.09.2015
+// author:			jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+.section {
+  position: relative;
+  //overflow: hidden;
+}
+
+.section-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+}
+
+.section-bg-layer {
+  @include position(absolute, 0, 0, 0, 0);
+  overflow: hidden;
+
+  > div {
+	position: relative;
+	height: 100%;
+	text-align: center;
+  }
+}
+
+//@todo JBE - odstranit první řádek pro příští release
+.wnd-video-background,
+.wnd-background-video {
+  &.orientation-landscape {
+	width: 100%;
+	height: auto;
+  }
+
+  &.orientation-portrait {
+	width: auto;
+	height: 100%;
+  }
+}
+
+.section-bg-overlay {
+  display: none;
+}
+
+.wnd-background-image {
+  -webkit-background-size: cover;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.wnd-background-pattern {
+  background-repeat: repeat;
+  background-size: auto;
+}
+
+.wnd-background-image,
+.wnd-background-pattern,
+.wnd-background-video {
+  + .section-bg-overlay {
+	display: block;
+  }
+}
+
+
+// Background positions -------------------------
+
+.bgpos-top-center {
+  background-position: center top;
+}
+
+.bgpos-center-center {
+  background-position: center center;
+}
+
+.bgpos-bottom-center {
+  background-position: center bottom;
+}
+
+
+// Background Paralax ---------------------------
+
+body:not(.touched) .bgatt-fixed {
+  background-attachment: fixed;
+}
+
+.bgatt-scroll {
+  background-attachment: scroll;
+}
+
+body:not(.wnd-cms) {
+
+  .section {
+	z-index: 0;
+  }
+
+  .section-bg {
+	z-index: -1;
+  }
+
+  .parallax {
+	position: fixed;
+	z-index: -1;
+	@include transform(translate3d(0, 0, 0));
+	pointer-events: none;
+  }
+}
+
+// IMG instead of video tag for free account ----
+
+body:not(.wnd-cms) {
+
+  &:not(.isIE) {
+
+	.section-bg {
+	  img.wnd-video-background {
+		height: 100%;
+		object-fit: cover;
+	  }
+	}
+
+  }
+  &.isIE {
+
+	.section-bg {
+	  img.wnd-video-background {
+		height: 100%;
+		width: auto;
+	  }
+	}
+
+  }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// fullscreen-header.scss
+//
+// Responsivní chování pro fullscreen header
+//
+// version:         1.0
+// date:            12.09.2015
+// author:			jbe
+// ---------------------------------------------------------------------------------------------------------------------
+
+.section-wrapper .fullscreen {
+  height: 100vh;
+  min-height: 400px;
+  max-height: 500px;
+
+  @include mq($min-width: 321px, $min-height: 481px) {
+	height: 75vh;
+  }
+
+  @include mq($min-width: $wtf-bp-mobile, $min-height: 600px) {
+	height: 60vh;
+	max-height: 550px;
+  }
+
+  @include mq($min-width: $wtf-bp-phablet, $min-height: 600px) {
+	height: 50vh;
+	max-height: 600px;
+  }
+
+  @include mq($min-width: $wtf-bp-desktop, $min-height: 769px) {
+	height: 70vh;
+	max-height: 600px;
+  }
+
+  @include mq($min-width: $wtf-bp-desktop, $max-height: 768px) {
+	height: 100vh;
+	max-height: 100%;
+  }
+
+  @include mq($wtf-bp-desktop-hd) {
+	height: 85vh;
+	max-height: 800px;
+  }
+
+  @include mq(1600px) {
+	height: 80vh;
+	max-height: 845px;
+  }
+
+  @include mq(1800px) {
+	height: 77vh;
+	max-height: 870px;
+  }
+}
+
+// CMS uprava roztazeni na fullscreen
+.wnd-cms .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet) {
+	height: calc(100vh - #{$wtf-cms-toolbar-height});
+	max-height: calc(100vh - #{$wtf-cms-toolbar-height});
+  }
+}
+
+
+// Korekce výšky sekce při zobrazení Cookie baru
+#wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet)  {
+	height: calc(100vh - #{$wtf-user-bar-height});
+  }
+}
+
+// Korekce výšky sekce při zobrazení User baru
+#wnd_user_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet)  {
+	height: calc(100vh - #{$wtf-user-bar-height});
+  }
+}
+
+// Korekce výšky sekce při zobrazení Cookie baru a User baru
+#wnd_user_bar:not([style="display: none;"]) + #wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen:first-child {
+  @include mq($min-width: $wtf-bp-desktop, $max-height: $wtf-bp-tablet)  {
+	height: calc(100vh - #{$wtf-cookie-bar-height} - #{$wtf-user-bar-height});
+  }
+}
+
+// Absolute fullscreen header ------------------------------------------------------------------------------------------
+
+.section-wrapper .fullscreen-all {
+  height: 100vh;
+  min-height: 360px;
+  max-height: 100%;
+
+  @media all and (max-width: 899px) and (orientation: portrait) {
+	height: 62vh;
+  }
+
+  @media all and (max-width: 899px) and (orientation: landscape) {
+	height: 82vh;
+  }
+
+  @media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (orientation: landscape)
+  and (-webkit-min-device-pixel-ratio: 2) {
+	height: 280px;
+  }
+  @media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (orientation: portrait)
+  and (-webkit-min-device-pixel-ratio: 2) {
+	height: 400px;
+  }
+}
+
+.ios-iframe .section-wrapper .fullscreen-all {
+  max-height: 500px;
+
+  @include mq($min-width: $wtf-bp-mobile, $min-height: 600px) {
+	max-height: 600px;
+  }
+
+  @include mq($min-width: $wtf-bp-tablet, $min-height: $wtf-bp-tablet) {
+	max-height: 800px;
+  }
+}
+
+// CMS uprava roztazeni na fullscreen
+.wnd-cms .section-wrapper .fullscreen-all {
+  height: calc(100vh - #{$wtf-cms-toolbar-height});
+  max-height: calc(100vh - #{$wtf-cms-toolbar-height});
+}
+
+
+// Korekce výšky sekce při zobrazení Cookie baru
+#wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen-all:first-child {
+  height: calc(100vh - #{$wtf-cookie-bar-height});
+}
+
+// Korekce výšky sekce při zobrazení User baru
+#wnd_user_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen-all:first-child {
+  height: calc(100vh - #{$wtf-user-bar-height});
+}
+
+// Korekce výšky sekce při zobrazení Cookie baru a User baru
+#wnd_user_bar:not([style="display: none;"]) + #wnd_cookie_bar:not([style="display: none;"]) ~ .wnd-page .section-wrapper  .fullscreen-all:first-child {
+  height: calc(100vh - #{$wtf-cookie-bar-height} - #{$wtf-user-bar-height});
+}
